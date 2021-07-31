@@ -78,7 +78,7 @@ function HomePage() {
           id: "3",
           type: "btnSelectorNode",
           data: {
-            label: `Next Step`,
+            label: `Then...`,
             type: "condition",
             // btnLabel: "Add condition",
             // btnAction: () => {
@@ -97,7 +97,7 @@ function HomePage() {
           id: "4",
           type: "btnSelectorNode",
           data: {
-            label: `Next Step`,
+            label: `Then...`,
             type: "condition",
             // btnLabel: "Add condition",
             // btnAction: () => {
