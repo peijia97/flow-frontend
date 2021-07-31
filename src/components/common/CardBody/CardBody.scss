@@ -10,13 +10,20 @@
 .CardBody {
   @extend %shared-card-body;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   position: relative;
   width: inherit;
   background-color: white;
   &.has-show-more {
+    max-height: 7rem;
+    overflow: hidden;
     margin-bottom: 0.3rem;
     border-radius: 0;
+  }
+
+  &.show-all {
+    max-height: inherit;
   }
 }
 

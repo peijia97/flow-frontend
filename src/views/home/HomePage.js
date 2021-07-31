@@ -8,12 +8,14 @@ import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
+import AddBoxOutlinedIcon from "@material-ui/icons/AddBoxOutlined";
 import { Background } from "components/common/Background/Background";
 import { CardHeader } from "components/common/CardHeader/CardHeader";
 import { CardBody } from "components/common/CardBody/CardBody";
 import ButtonSelectorNode from "components/ButtonSelectorNode/ButtonSelectorNode";
 
 import "./HomePage.scss";
+import { ACTIONS, CONDITIONS, EVENTS } from "constants/constants";
 
 const nodeTypes = {
   btnSelectorNode: ButtonSelectorNode
@@ -91,64 +93,19 @@ function HomePage() {
     <Background fullHeight color="HomePage grey100">
       <div className="drawer">
         <CardHeader>
-          <Typography variant="h3">Event</Typography>
+          <Typography variant="h3">Events</Typography>
         </CardHeader>
-        <CardBody>
-          <Typography variant="h3">Event</Typography>
-        </CardBody>
+        <CardBody listItems={EVENTS} />
 
         <CardHeader>
-          <Typography variant="h3">Condition</Typography>
+          <Typography variant="h3">Conditions</Typography>
         </CardHeader>
-        <CardBody>
-          <Typography variant="h3">Event</Typography>
-        </CardBody>
+        <CardBody listItems={CONDITIONS} />
 
         <CardHeader>
-          <Typography variant="h3">Action</Typography>
+          <Typography variant="h3">Actions</Typography>
         </CardHeader>
-        <CardBody>
-          <Typography variant="h3">Event</Typography>
-        </CardBody>
-        {/* <Typography variant="h5">Select conditions</Typography>
-        <Typography variant="body1">
-          Take different actions based on the condition you select
-        </Typography>
-
-        <div className="d-flex justify-space-between align-items-center mt-1">
-          <Typography variant="h6">If</Typography>
-          <Button onClick={() => {}} variant="text">
-            Delete
-          </Button>
-        </div>
-
-        <TextField
-          variant="outlined"
-          value="Testing"
-          margin="dense"
-          fullWidth
-          readOnly
-        />
-
-        <FormControl variant="outlined" margin="dense" fullWidth>
-          <InputLabel>Select</InputLabel>
-          <Select value={age} onChange={handleChange} label="Select">
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={10}>Ten</MenuItem>
-            <MenuItem value={20}>Twenty</MenuItem>
-            <MenuItem value={30}>Thirty</MenuItem>
-          </Select>
-        </FormControl>
-
-        <Button
-          onClick={() => {}}
-          variant="contained"
-          style={{ marginTop: "1rem" }}
-        >
-          Add another condition
-        </Button> */}
+        <CardBody listItems={ACTIONS} />
       </div>
       <div className="home-section">
         <CardHeader>
