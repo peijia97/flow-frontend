@@ -38,8 +38,12 @@ function HomePage() {
   const onElementsRemove = elementsToRemove =>
     setElements(els => removeElements(elementsToRemove, els));
   const onConnect = params => setElements(els => addEdge(params, els));
-  const stateRef = useRef();
-  stateRef.current = elements;
+  const elementsStateRef = useRef();
+  elementsStateRef.current = elements;
+  const selConditionStateRef = useRef();
+  selConditionStateRef.current = selectedCondition;
+  const selActionStateRef = useRef();
+  selActionStateRef.current = selectedCondition;
 
   const handleEventChange = id => {
     setSelectedEvent([id]);
@@ -177,7 +181,7 @@ function HomePage() {
   };
 
   const handleDeleteCondition = (nodeId, itemId) => {
-    let tempElems = Object.assign([], stateRef.current);
+    let tempElems = Object.assign([], elementsStateRef.current);
     let tempElemIndex = tempElems.findIndex(t => t.id === nodeId);
     tempElems[tempElemIndex] = {
       ...tempElems[tempElemIndex],
@@ -188,12 +192,14 @@ function HomePage() {
         )
       }
     };
-    setSelectedCondition(selectedCondition.filter(c => c.id !== itemId));
+    setSelectedCondition(
+      selConditionStateRef.current.filter(c => c !== itemId)
+    );
     setElements(tempElems);
   };
 
   const handleDeleteAction = (nodeId, itemId) => {
-    let tempElems = Object.assign([], stateRef.current);
+    let tempElems = Object.assign([], elementsStateRef.current);
     let tempElemIndex = tempElems.findIndex(t => t.id === nodeId);
     tempElems[tempElemIndex] = {
       ...tempElems[tempElemIndex],
@@ -204,7 +210,7 @@ function HomePage() {
         )
       }
     };
-    setSelectedAction(selectedAction.filter(a => a.id !== itemId));
+    setSelectedAction(selActionStateRef.current.filter(a => a !== itemId));
     setElements(tempElems);
   };
 
