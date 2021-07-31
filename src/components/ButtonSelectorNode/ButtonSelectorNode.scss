@@ -7,14 +7,25 @@
   text-align: center;
   border-radius: 0.5rem;
   border: 0.15rem solid $grey300;
+  max-width: 15rem;
 
   .MuiTypography-root {
     text-align: center;
     margin-bottom: 0.5rem;
   }
 
-  .selected {
+  .lbl-event {
     background-color: $primaryLight !important;
+    color: $grey800 !important;
+  }
+
+  .lbl-condition {
+    background-color: $purpleLight !important;
+    color: $grey800 !important;
+  }
+
+  .lbl-action {
+    background-color: $successLight !important;
     color: $grey800 !important;
   }
 }

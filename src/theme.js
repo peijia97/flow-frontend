@@ -7,6 +7,7 @@ const colors = {
   primaryLight: "#1e95da",
   primaryDark: "#007ABF",
   success: "#009C6A",
+  successLight: "#d1ffe3",
   danger: "#D94D4C",
   grey100: "#F5F6F9",
   grey200: "#edf2f7",

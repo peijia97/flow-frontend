@@ -7,7 +7,7 @@ import "./CardBody.scss";
 
 const CardBody = props => {
   const [showMore, setShowMore] = useState(false);
-  const { listItems, ...rest } = props;
+  const { listItems, selectedId, handleSelect, ...rest } = props;
   return (
     <>
       <div
@@ -16,17 +16,20 @@ const CardBody = props => {
         }`}
         {...rest}
       >
-        {listItems.map(item => (
-          <Button
-            onClick={() => {}}
-            disableRipple
-            variant="text"
-            className="btn-card-item"
-            startIcon={<AddBoxOutlinedIcon />}
-          >
-            {item.name}
-          </Button>
-        ))}
+        {listItems
+          .filter(x => !selectedId.includes(x.id))
+          .map(item => (
+            <Button
+              key={item.id}
+              onClick={() => handleSelect(item.id)}
+              disableRipple
+              variant="text"
+              className="btn-card-item"
+              startIcon={<AddBoxOutlinedIcon />}
+            >
+              {item.name}
+            </Button>
+          ))}
       </div>
       {listItems.length > 3 && (
         <div className="btn-show-more">

@@ -12,26 +12,51 @@ export default memo(({ data, isConnectable }) => {
       <div>
         <Typography variant="body1">{data.label}</Typography>
       </div>
+      {data.eventLabel && (
+        <Button
+          onClick={() => {}}
+          variant="contained"
+          disabled
+          className="lbl-event"
+        >
+          {data.eventLabel}
+        </Button>
+      )}
+
       {data.conditionLabel && (
         <Button
           onClick={() => {}}
           variant="contained"
           disabled
-          className="selected"
+          className="lbl-condition"
         >
-          {data.conditionLabel}
+          {data.conditionLabel.join(" AND ")}
         </Button>
       )}
+
+      {data.actionLabel && (
+        <Button
+          onClick={() => {}}
+          variant="contained"
+          disabled
+          className="lbl-action"
+        >
+          {data.actionLabel.join(" AND ")}
+        </Button>
+      )}
+
       {data.btnLabel && (
-        <Button onClick={() => {}} variant="contained">
+        <Button onClick={() => data.btnAction()} variant="contained">
           {data.btnLabel}
         </Button>
       )}
+
       {data.btnLabel2 && (
-        <Button onClick={() => {}} variant="contained">
+        <Button onClick={() => data.btnAction2()} variant="contained">
           {data.btnLabel2}
         </Button>
       )}
+
       <Handle
         type="source"
         position="bottom"
