@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 
-import { Handle } from "react-flow-renderer";
+import { Handle, useStoreState } from "react-flow-renderer";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
@@ -8,15 +8,22 @@ import IconButton from "@material-ui/core/IconButton";
 
 import "./ButtonSelectorNode.scss";
 
-export default memo(({ data, isConnectable }) => {
+export default memo(({ id, data, isConnectable }) => {
+  const selectedElements = useStoreState(store => store.selectedElements);
+
   return (
-    <div className="ButtonSelectorNode">
+    <div
+      className={`ButtonSelectorNode ${
+        selectedElements && selectedElements[0].id === id ? "is-selected" : ""
+      }`}
+      onClick={() => data.btnAction()}
+    >
       <div>
         <Typography variant="body1">{data.label}</Typography>
       </div>
-      {data.eventLabel && (
+      {data.event && (
         <Button variant="contained" disabled className="lbl-event">
-          {data.eventLabel}
+          {data.event.name}
         </Button>
       )}
 
@@ -46,7 +53,7 @@ export default memo(({ data, isConnectable }) => {
           <React.Fragment key={a.id}>
             <div className="label-div">
               <Button variant="contained" disabled className="lbl-action">
-                {a.name}
+                {a.name} - {a.value}
                 {/* {data.actionLabel.join(" AND ")} */}
               </Button>
               <IconButton
@@ -63,13 +70,25 @@ export default memo(({ data, isConnectable }) => {
         ))}
 
       {data.btnLabel && (
-        <Button onClick={() => data.btnAction()} variant="contained">
+        <Button
+          onClick={e => {
+            data.btnAction();
+            e.stopPropagation();
+          }}
+          variant="contained"
+        >
           {data.btnLabel}
         </Button>
       )}
 
       {data.btnLabel2 && (
-        <Button onClick={() => data.btnAction2()} variant="contained">
+        <Button
+          onClick={e => {
+            data.btnAction2();
+            e.stopPropagation();
+          }}
+          variant="contained"
+        >
           {data.btnLabel2}
         </Button>
       )}

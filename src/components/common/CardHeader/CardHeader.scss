@@ -10,6 +10,12 @@
   border-top-left-radius: 1rem;
   border-top-right-radius: 1rem;
   background-color: white;
+  justify-content: space-between;
+
+  .left-section {
+    display: inherit;
+    align-items: inherit;
+  }
 
   .MuiIconButton-root {
     background-color: transparent;

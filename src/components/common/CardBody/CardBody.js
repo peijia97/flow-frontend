@@ -7,7 +7,7 @@ import "./CardBody.scss";
 
 const CardBody = props => {
   const [showMore, setShowMore] = useState(false);
-  const { listItems, selectedId, handleSelect, ...rest } = props;
+  const { listItems, selectedId, onFocusId, handleSelect, ...rest } = props;
   return (
     <>
       <div
@@ -24,7 +24,9 @@ const CardBody = props => {
               onClick={() => handleSelect(item.id)}
               disableRipple
               variant="text"
-              className="btn-card-item"
+              className={`btn-card-item ${
+                onFocusId === item.id ? "on-focus" : ""
+              }`}
               startIcon={<AddBoxOutlinedIcon />}
             >
               {item.name}

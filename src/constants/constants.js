@@ -14,9 +14,13 @@ export const CONDITIONS = [
   { id: 6, name: "Date < Today" }
 ];
 export const ACTIONS = [
-  { id: 1, name: "Send email to Contact" },
-  { id: 2, name: "Add tag to Contact" },
-  { id: 3, name: "Call Contact" },
-  { id: 4, name: "Cancel Contact" },
-  { id: 5, name: "Delete Contact" }
+  {
+    id: 1,
+    name: "Send email to Contact",
+    type: "email",
+    label: "Email address"
+  },
+  { id: 2, name: "Call Contact", type: "tel", label: "Contact Number" },
+  { id: 3, name: "Add Tag to Contact", type: "tel", label: "Contact Number" },
+  { id: 4, name: "Remove Contact", type: "tel", label: "Contact Number" }
 ];

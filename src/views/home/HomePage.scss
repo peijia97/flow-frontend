@@ -37,6 +37,10 @@
         margin-bottom: 0;
       }
 
+      &.on-focus {
+        background-color: $primaryLight !important;
+      }
+
       .MuiButton-label {
         font-size: 1rem;
         font-weight: 600;
@@ -44,6 +48,21 @@
 
       .MuiButton-startIcon {
         margin-right: 1rem;
+      }
+    }
+
+    .card-body {
+      display: flex;
+      background-color: white;
+      padding: 0.8rem 1.5rem;
+      width: inherit;
+      border-bottom-left-radius: 1rem;
+      border-bottom-right-radius: 1rem;
+      margin-bottom: 1rem;
+
+      .MuiButton-text {
+        padding: 0;
+        min-width: 2rem;
       }
     }
   }

@@ -3,11 +3,22 @@
 .ButtonSelectorNode {
   display: grid;
   background-color: white;
-  padding: 1rem 1.5rem;
+  padding: 1rem 1.5rem 1.5rem;
   text-align: center;
   border-radius: 0.5rem;
   border: 0.15rem solid $grey300;
-  max-width: 15rem;
+  width: 12rem;
+
+  &.is-selected {
+    background-color: $primaryLight;
+    border: 0.15rem solid $primary;
+
+    .lbl-event,
+    .lbl-condition,
+    .lbl-action {
+      background-color: white !important;
+    }
+  }
 
   .label-div {
     position: relative;
@@ -29,11 +40,13 @@
   }
 
   .MuiButton-root {
-    margin: 1rem 0;
+    margin: 1rem 0 0.5rem;
   }
 
   .Mui-disabled {
     margin: 0 !important;
+    width: 95%;
+    justify-self: center;
   }
 
   .lbl-event {
