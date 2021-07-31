@@ -1,0 +1,20 @@
+@import "src/scss/_variables";
+
+.ButtonSelectorNode {
+  display: grid;
+  background-color: white;
+  padding: 1rem;
+  text-align: center;
+  border-radius: 0.5rem;
+  border: 0.15rem solid $grey300;
+
+  .MuiTypography-root {
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .selected {
+    background-color: $secondary !important;
+    color: $grey800 !important;
+  }
+}

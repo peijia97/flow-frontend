@@ -1,0 +1,21 @@
+@import "src/scss/_variables";
+
+.CardHeader {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: inherit;
+  margin-bottom: 0.3rem;
+  padding: 0.8rem 1.5rem;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  background-color: white;
+
+  .MuiIconButton-root {
+    background-color: transparent;
+    .MuiSvgIcon-root {
+      width: 0.8em;
+      height: 0.8em;
+    }
+  }
+}

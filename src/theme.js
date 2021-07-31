@@ -2,7 +2,8 @@ import createMuiTheme from "@material-ui/core/styles/createTheme";
 
 const fontFamily = ["Roboto", "Helvetica Neue", "Arial", "sans-serif"];
 const colors = {
-  primary: "#5278CA",
+  primary: "#008CDC",
+  secondary: "#fae100",
   primaryLight: "#1e95da",
   primaryDark: "#007ABF",
   success: "#009C6A",
@@ -20,7 +21,7 @@ const colors = {
 export const theme = createMuiTheme({
   palette: {
     primary: { main: colors.primary },
-    secondary: { main: colors.success },
+    secondary: { main: colors.secondary },
     grey: {
       100: colors.grey100,
       200: colors.grey200,
@@ -38,6 +39,12 @@ export const theme = createMuiTheme({
   },
   overrides: {
     MuiTypography: {
+      h3: {
+        fontSize: "1.3rem",
+        fontWeight: "bold",
+        color: colors.grey900,
+        lineHeight: "2.2rem"
+      },
       h5: {
         fontSize: "1.1rem",
         fontWeight: "600",
@@ -91,7 +98,7 @@ export const theme = createMuiTheme({
       },
       text: {
         fontSize: "0.8rem",
-        color: `${colors.primaryLight} !important`,
+        color: `${colors.primary} !important`,
         textTransform: "inherit",
         fontWeight: "500 !important",
         lineHeight: "1.3rem",
@@ -115,7 +122,7 @@ export const theme = createMuiTheme({
         "& > span": {
           maxWidth: "4.5rem",
           width: "100%",
-          backgroundColor: colors.primaryLight
+          backgroundColor: colors.primary
         }
       }
     },

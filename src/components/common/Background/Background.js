@@ -1,5 +1,4 @@
 import React from "react";
-import Container from "@material-ui/core/Container";
 import "./Background.scss";
 
 const Background = props => {
@@ -9,7 +8,7 @@ const Background = props => {
       className={`Background ${color} ${!!fullHeight && "h-screen"}`}
       {...rest}
     >
-      <Container>{children}</Container>
+      {children}
     </div>
   );
 };

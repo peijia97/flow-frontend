@@ -1,23 +1,25 @@
 @import "src/scss/_variables";
 
 .HomePage {
+  display: flex;
   .home-section {
+    flex: 4;
     height: 90vh;
-    display: flex;
+    padding: 1rem;
+    padding-left: 0.5rem;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    .MuiTypography-h3 {
-      color: $grey900 !important;
-      text-align: center;
-      width: 100%;
-      font-weight: bold;
-      font-size: 1.8rem;
-      line-height: 2.2rem;
-      margin-bottom: 1rem;
-    }
     .MuiButton-root {
       margin-bottom: 1rem;
     }
+  }
+
+  .drawer {
+    flex: 1;
+    height: 100vh;
+    padding: 1rem;
+    padding-right: 0.5rem;
+    overflow: scroll;
   }
 }

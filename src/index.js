@@ -4,7 +4,6 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import { Route, Switch, BrowserRouter } from "react-router-dom";
 import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
 import { Background } from "components/common/Background/Background";
-import { PrintModal } from "components/common/PrintModal/PrintModal";
 import reportWebVitals from "reportWebVitals";
 import { theme } from "theme";
 
@@ -25,7 +24,6 @@ const App = () => {
     <BrowserRouter>
       <MuiThemeProvider theme={theme}>
         <Suspense fallback={loading}>
-          <PrintModal />
           <Switch>
             <Route
               path="/"

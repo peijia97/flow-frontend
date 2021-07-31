@@ -4,3 +4,9 @@
   padding-left: 24px !important;
   padding-right: 24px !important;
 }
+
+// fix react flow font
+.react-flow__edge-text {
+  font-family: monospace;
+  font-size: 1rem !important;
+}
