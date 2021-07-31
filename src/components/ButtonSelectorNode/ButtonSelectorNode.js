@@ -15,50 +15,51 @@ export default memo(({ data, isConnectable }) => {
         <Typography variant="body1">{data.label}</Typography>
       </div>
       {data.eventLabel && (
-        <div className="label-div">
-          <Button variant="contained" disabled className="lbl-event">
-            {data.eventLabel}
-          </Button>
-          <IconButton disableRipple>
-            <HighlightOffIcon />
-          </IconButton>
-        </div>
+        <Button variant="contained" disabled className="lbl-event">
+          {data.eventLabel}
+        </Button>
       )}
 
-      {data.conditionLabel &&
-        data.conditionLabel.map((c, i) => (
-          <>
+      {data.conditions?.length > 0 &&
+        data.conditions.map((c, i) => (
+          <React.Fragment key={c.id}>
             <div className="label-div">
               <Button variant="contained" disabled className="lbl-condition">
-                {c}
+                {c.name}
                 {/* {data.conditionLabel.join(" AND ")} */}
               </Button>
-              <IconButton disableRipple>
+              <IconButton
+                disableRipple
+                onClick={() => data.handleDeleteCondition(c.id)}
+              >
                 <HighlightOffIcon />
               </IconButton>
-              {i !== data.conditionLabel.length - 1 && (
+              {i !== data.conditions.length - 1 && (
                 <Typography variant="h6">AND</Typography>
               )}
             </div>
-          </>
+          </React.Fragment>
         ))}
 
-      {data.actionLabel &&
-        data.actionLabel.map((c, i) => (
-          <>
+      {data.actions?.length > 0 &&
+        data.actions.map((a, i) => (
+          <React.Fragment key={a.id}>
             <div className="label-div">
               <Button variant="contained" disabled className="lbl-action">
-                {c}
+                {a.name}
                 {/* {data.actionLabel.join(" AND ")} */}
               </Button>
-              <IconButton disableRipple>
+              <IconButton
+                disableRipple
+                onClick={() => data.handleDeleteAction(a.id)}
+              >
                 <HighlightOffIcon />
               </IconButton>
-              {i !== data.actionLabel.length - 1 && (
+              {i !== data.actions.length - 1 && (
                 <Typography variant="h6">AND</Typography>
               )}
             </div>
-          </>
+          </React.Fragment>
         ))}
 
       {data.btnLabel && (

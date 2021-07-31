@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import ReactFlow, { removeElements, addEdge } from "react-flow-renderer";
 
 import Typography from "@material-ui/core/Typography";
@@ -38,6 +38,8 @@ function HomePage() {
   const onElementsRemove = elementsToRemove =>
     setElements(els => removeElements(elementsToRemove, els));
   const onConnect = params => setElements(els => addEdge(params, els));
+  const stateRef = useRef();
+  stateRef.current = elements;
 
   const handleEventChange = id => {
     setSelectedEvent([id]);
@@ -70,7 +72,8 @@ function HomePage() {
             btnAction: () => {
               setShowDrawer("conditions");
               setSelectedNode("2");
-            }
+            },
+            handleDeleteCondition: itemId => handleDeleteCondition("2", itemId)
           },
           position: { x: 250, y: 200 }
         },
@@ -89,7 +92,8 @@ function HomePage() {
             btnAction2: () => {
               setShowDrawer("actions");
               setSelectedNode("3");
-            }
+            },
+            handleDeleteAction: itemId => handleDeleteAction("3", itemId)
           },
           position: { x: 250, y: 600 }
         },
@@ -108,7 +112,8 @@ function HomePage() {
             btnAction2: () => {
               setShowDrawer("actions");
               setSelectedNode("4");
-            }
+            },
+            handleDeleteAction: itemId => handleDeleteAction("4", itemId)
           },
           position: { x: 500, y: 350 }
         },
@@ -145,9 +150,9 @@ function HomePage() {
       ...tempElems[tempElemIndex],
       data: {
         ...tempElems[tempElemIndex].data,
-        conditionLabel: [
-          ...(tempElems[tempElemIndex].data?.conditionLabel || []),
-          CONDITIONS.find(e => e.id === id).name
+        conditions: [
+          ...(tempElems[tempElemIndex].data?.conditions || []),
+          CONDITIONS.find(e => e.id === id)
         ]
       }
     };
@@ -162,12 +167,44 @@ function HomePage() {
       ...tempElems[tempElemIndex],
       data: {
         ...tempElems[tempElemIndex].data,
-        actionLabel: [
-          ...(tempElems[tempElemIndex].data?.actionLabel || []),
-          ACTIONS.find(e => e.id === id).name
+        actions: [
+          ...(tempElems[tempElemIndex].data?.actions || []),
+          ACTIONS.find(e => e.id === id)
         ]
       }
     };
+    setElements(tempElems);
+  };
+
+  const handleDeleteCondition = (nodeId, itemId) => {
+    let tempElems = Object.assign([], stateRef.current);
+    let tempElemIndex = tempElems.findIndex(t => t.id === nodeId);
+    tempElems[tempElemIndex] = {
+      ...tempElems[tempElemIndex],
+      data: {
+        ...tempElems[tempElemIndex].data,
+        conditions: (tempElems[tempElemIndex].data?.conditions || []).filter(
+          t => t.id !== itemId
+        )
+      }
+    };
+    setSelectedCondition(selectedCondition.filter(c => c.id !== itemId));
+    setElements(tempElems);
+  };
+
+  const handleDeleteAction = (nodeId, itemId) => {
+    let tempElems = Object.assign([], stateRef.current);
+    let tempElemIndex = tempElems.findIndex(t => t.id === nodeId);
+    tempElems[tempElemIndex] = {
+      ...tempElems[tempElemIndex],
+      data: {
+        ...tempElems[tempElemIndex].data,
+        actions: (tempElems[tempElemIndex].data?.actions || []).filter(
+          t => t.id !== itemId
+        )
+      }
+    };
+    setSelectedAction(selectedAction.filter(a => a.id !== itemId));
     setElements(tempElems);
   };
 
