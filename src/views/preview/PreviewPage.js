@@ -78,13 +78,13 @@ function PreviewPage() {
                 label: "When",
                 type: "event",
                 btnLabel: "Select event trigger",
-                focusNodeAction: () => {
+                focusNodeAction: id => {
                   setShowDrawer("events");
-                  setSelectedNode(nodeId.toString());
+                  setSelectedNode(id);
                 },
-                btnAction: () => {
+                btnAction: id => {
                   setShowDrawer("events");
-                  setSelectedNode(nodeId.toString());
+                  setSelectedNode(id);
                 },
                 ...input
               },
@@ -109,15 +109,15 @@ function PreviewPage() {
                 label: "If...",
                 type: "condition",
                 btnLabel: "Add condition",
-                focusNodeAction: () => {
+                focusNodeAction: id => {
                   setShowDrawer("conditions");
-                  setSelectedNode(nodeId.toString());
+                  setSelectedNode(id);
                 },
-                btnAction: () => {
+                btnAction: id => {
                   setShowDrawer("conditions");
-                  setSelectedNode(nodeId.toString());
+                  setSelectedNode(id);
                 },
-                handleDeleteCondition: itemId =>
+                handleDeleteCondition: (nodeId, itemId) =>
                   handleDeleteCondition(nodeId, itemId),
                 ...input
               },
@@ -149,15 +149,15 @@ function PreviewPage() {
               label: `Then...`,
               type: "action-yes",
               btnLabel: "Add action",
-              focusNodeAction: () => {
+              focusNodeAction: id => {
                 setShowDrawer("actions");
-                setSelectedNode(nodeId.toString());
+                setSelectedNode(id);
               },
-              btnAction: () => {
+              btnAction: id => {
                 setShowDrawer("actions");
-                setSelectedNode(nodeId.toString());
+                setSelectedNode(id);
               },
-              handleDeleteCondition: itemId =>
+              handleDeleteCondition: (nodeId, itemId) =>
                 handleDeleteCondition(nodeId, itemId),
               actions: input["action-yes"]
             },
@@ -174,15 +174,15 @@ function PreviewPage() {
               label: `Then...`,
               type: "action",
               btnLabel: "Add action",
-              focusNodeAction: () => {
+              focusNodeAction: id => {
                 setShowDrawer("actions");
-                setSelectedNode(nodeId.toString());
+                setSelectedNode(id);
               },
-              btnAction: () => {
+              btnAction: id => {
                 setShowDrawer("actions");
-                setSelectedNode(nodeId.toString());
+                setSelectedNode(id);
               },
-              handleDeleteCondition: itemId =>
+              handleDeleteCondition: (nodeId, itemId) =>
                 handleDeleteCondition(nodeId, itemId),
               actions: input["action"]
             },
@@ -214,13 +214,13 @@ function PreviewPage() {
       label: `Next Step`,
       type: "choice",
       btnLabel: "Add condition",
-      focusNodeAction: () => {
+      focusNodeAction: id => {
         setShowDrawer(null);
-        setSelectedNode(nodeId);
+        setSelectedNode(id);
       },
-      btnAction: () => {
+      btnAction: id => {
         setShowDrawer("conditions");
-        setSelectedNode(nodeId);
+        setSelectedNode(id);
 
         let tempElems = Object.assign([], elementsStateRef.current);
         tempElems = tempElems.filter(
@@ -236,15 +236,15 @@ function PreviewPage() {
               label: `If...`,
               type: "condition",
               btnLabel: "Add condition",
-              focusNodeAction: () => {
+              focusNodeAction: id => {
                 setShowDrawer("conditions");
-                setSelectedNode(nodeId);
+                setSelectedNode(id);
               },
-              btnAction: () => {
+              btnAction: id => {
                 setShowDrawer("conditions");
-                setSelectedNode(nodeId);
+                setSelectedNode(id);
               },
-              handleDeleteCondition: itemId =>
+              handleDeleteCondition: (nodeId, itemId) =>
                 handleDeleteCondition(nodeId, itemId)
             },
             position: position
@@ -256,16 +256,16 @@ function PreviewPage() {
               label: `Then...`,
               type: "action-yes",
               btnLabel: "Add action",
-              focusNodeAction: () => {
+              focusNodeAction: id => {
                 setShowDrawer("actions");
-                setSelectedNode((Number(nodeId) + 1).toString());
+                setSelectedNode(id);
               },
-              btnAction: () => {
+              btnAction: id => {
                 setShowDrawer("actions");
-                setSelectedNode((Number(nodeId) + 1).toString());
+                setSelectedNode(id);
               },
-              handleDeleteAction: itemId =>
-                handleDeleteAction((Number(nodeId) + 1).toString(), itemId)
+              handleDeleteAction: (nodeId, itemId) =>
+                handleDeleteAction(nodeId, itemId)
             },
             position: { x: position.x, y: position.y + 400 }
           },
@@ -324,15 +324,16 @@ function PreviewPage() {
               label: `Then...`,
               type: "action",
               btnLabel: "Add action",
-              focusNodeAction: () => {
+              focusNodeAction: id => {
                 setShowDrawer("actions");
-                setSelectedNode(nodeId);
+                setSelectedNode(id);
               },
-              btnAction: () => {
+              btnAction: id => {
                 setShowDrawer("actions");
-                setSelectedNode(nodeId);
+                setSelectedNode(id);
               },
-              handleDeleteAction: itemId => handleDeleteAction(nodeId, itemId)
+              handleDeleteAction: (nodeId, itemId) =>
+                handleDeleteAction(nodeId, itemId)
             },
             position: position
           },
@@ -350,7 +351,8 @@ function PreviewPage() {
 
         setElements(tempElems);
       },
-      handleDeleteCondition: itemId => handleDeleteCondition(nodeId, itemId)
+      handleDeleteCondition: (nodeId, itemId) =>
+        handleDeleteCondition(nodeId, itemId)
     };
   };
 
@@ -364,13 +366,13 @@ function PreviewPage() {
         label: "When",
         type: "event",
         event: EVENTS.find(e => e.id === id),
-        focusNodeAction: () => {
+        focusNodeAction: id => {
           setShowDrawer("events");
-          setSelectedNode("1");
+          setSelectedNode(id);
         },
-        btnAction: () => {
+        btnAction: id => {
           setShowDrawer("events");
-          setSelectedNode("1");
+          setSelectedNode(id);
         }
       },
       position: { x: 250, y: 25 }
@@ -504,7 +506,6 @@ function PreviewPage() {
           break;
       }
     });
-    console.log("elementes", elements);
     console.log("output", outputArr);
   };
 

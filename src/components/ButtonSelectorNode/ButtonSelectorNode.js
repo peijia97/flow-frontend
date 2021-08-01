@@ -16,7 +16,7 @@ export default memo(({ id, data, isConnectable }) => {
       className={`ButtonSelectorNode ${
         selectedElements && selectedElements[0].id === id ? "is-selected" : ""
       }`}
-      onClick={() => data.focusNodeAction()}
+      onClick={() => data.focusNodeAction(id)}
     >
       <div>
         <Typography variant="body1">{data.label}</Typography>
@@ -30,7 +30,7 @@ export default memo(({ id, data, isConnectable }) => {
           data.btnLabel && (
             <Button
               onClick={e => {
-                data.btnAction();
+                data.btnAction(id);
                 e.stopPropagation();
               }}
               variant="contained"
@@ -54,7 +54,7 @@ export default memo(({ id, data, isConnectable }) => {
                   </Button>
                   <IconButton
                     disableRipple
-                    onClick={() => data.handleDeleteCondition(c.id)}
+                    onClick={() => data.handleDeleteCondition(id, c.id)}
                   >
                     <HighlightOffIcon />
                   </IconButton>
