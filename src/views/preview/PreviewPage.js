@@ -10,13 +10,13 @@ import { CardBody } from "components/common/CardBody/CardBody";
 import ButtonSelectorNode from "components/ButtonSelectorNode/ButtonSelectorNode";
 import { ACTIONS, CONDITIONS, EVENTS } from "constants/constants";
 
-import "./HomePage.scss";
+import "./PreviewPage.scss";
 
 const nodeTypes = {
   btnSelectorNode: ButtonSelectorNode
 };
 
-function HomePage() {
+function PreviewPage() {
   const [showDrawer, setShowDrawer] = useState("events");
   const [selectedNode, setSelectedNode] = useState("1");
   const [selectedEvent, setSelectedEvent] = useState([]);
@@ -24,27 +24,179 @@ function HomePage() {
   const [selectedAction, setSelectedAction] = useState({});
   const [clickedAction, setClickedAction] = useState(null);
 
-  const initialElements = [
+  const inputArr = [
     {
-      id: "1",
-      type: "btnSelectorNode",
-      data: {
-        label: "When",
-        type: "event",
-        btnLabel: "Select event trigger",
-        focusNodeAction: () => {
-          setShowDrawer("events");
-          setSelectedNode("1");
-        },
-        btnAction: () => {
-          setShowDrawer("events");
-          setSelectedNode("1");
+      event: {
+        id: 1,
+        name: "New order placed"
+      }
+    },
+    {
+      conditions: [
+        {
+          id: 1,
+          name: "Amount > 100"
         }
-      },
-      position: { x: 250, y: 25 }
+      ]
+    },
+    {
+      "action-yes": [
+        {
+          id: 2,
+          label: "Call Contact",
+          name: "Call Contact",
+          type: "tel",
+          value: "888"
+        }
+      ]
+    },
+    {
+      action: [
+        {
+          id: 2,
+          label: "Contact Number",
+          name: "Call Contact",
+          type: "tel",
+          value: "999"
+        }
+      ]
     }
   ];
-  const [elements, setElements] = useState(initialElements);
+
+  const generateInitialElements = () => {
+    const initialElements = [];
+    let nodeId = 1;
+    let position = { x: 250, y: 25 };
+    inputArr.forEach(input => {
+      switch (Object.keys(input)[0]) {
+        case "event":
+          initialElements.push(
+            {
+              id: nodeId.toString(),
+              type: "btnSelectorNode",
+              data: {
+                label: "When",
+                type: "event",
+                btnLabel: "Select event trigger",
+                focusNodeAction: () => {
+                  setShowDrawer("events");
+                  setSelectedNode(nodeId.toString());
+                },
+                btnAction: () => {
+                  setShowDrawer("events");
+                  setSelectedNode(nodeId.toString());
+                },
+                ...input
+              },
+              position: position
+            },
+            {
+              id: `edges-${nodeId.toString()}-${nodeId + 1}`, // edges-1-2
+              source: nodeId.toString(),
+              target: (Number(nodeId) + 1).toString(),
+              type: "smoothstep"
+            }
+          );
+          break;
+        case "conditions":
+          position = { x: position.x, y: position.y + 175 };
+          ++nodeId;
+          initialElements.push(
+            {
+              id: nodeId.toString(),
+              type: "btnSelectorNode",
+              data: {
+                label: "If...",
+                type: "condition",
+                btnLabel: "Add condition",
+                focusNodeAction: () => {
+                  setShowDrawer("conditions");
+                  setSelectedNode(nodeId.toString());
+                },
+                btnAction: () => {
+                  setShowDrawer("conditions");
+                  setSelectedNode(nodeId.toString());
+                },
+                handleDeleteCondition: itemId =>
+                  handleDeleteCondition(nodeId, itemId),
+                ...input
+              },
+              position: position
+            },
+            {
+              id: `edges-${nodeId.toString()}-${nodeId + 1}`, // edges-2-3
+              source: nodeId.toString(),
+              target: (Number(nodeId) + 1).toString(),
+              type: "smoothstep",
+              label: "yes"
+            },
+            {
+              id: `edges-${nodeId.toString()}-${nodeId + 2}`, // edges-2-4
+              source: nodeId.toString(),
+              target: (Number(nodeId) + 2).toString(),
+              type: "smoothstep",
+              label: "no"
+            }
+          );
+          break;
+        case "action-yes":
+          position = { x: position.x, y: position.y + 400 };
+          ++nodeId;
+          initialElements.push({
+            id: nodeId.toString(),
+            type: "btnSelectorNode",
+            data: {
+              label: `Then...`,
+              type: "action-yes",
+              btnLabel: "Add action",
+              focusNodeAction: () => {
+                setShowDrawer("actions");
+                setSelectedNode(nodeId.toString());
+              },
+              btnAction: () => {
+                setShowDrawer("actions");
+                setSelectedNode(nodeId.toString());
+              },
+              handleDeleteCondition: itemId =>
+                handleDeleteCondition(nodeId, itemId),
+              actions: input["action-yes"]
+            },
+            position: position
+          });
+          break;
+        case "action":
+          position = { x: position.x + 300, y: position.y };
+          ++nodeId;
+          initialElements.push({
+            id: nodeId.toString(),
+            type: "btnSelectorNode",
+            data: {
+              label: `Then...`,
+              type: "action",
+              btnLabel: "Add action",
+              focusNodeAction: () => {
+                setShowDrawer("actions");
+                setSelectedNode(nodeId.toString());
+              },
+              btnAction: () => {
+                setShowDrawer("actions");
+                setSelectedNode(nodeId.toString());
+              },
+              handleDeleteCondition: itemId =>
+                handleDeleteCondition(nodeId, itemId),
+              actions: input["action"]
+            },
+            position: position
+          });
+          break;
+        default:
+          break;
+      }
+    });
+    return initialElements;
+  };
+
+  const [elements, setElements] = useState(generateInitialElements());
   const onElementsRemove = elementsToRemove =>
     setElements(els => removeElements(elementsToRemove, els));
   const onConnect = params => setElements(els => addEdge(params, els));
@@ -352,6 +504,7 @@ function HomePage() {
           break;
       }
     });
+    console.log("elementes", elements);
     console.log("output", outputArr);
   };
 
@@ -363,7 +516,7 @@ function HomePage() {
   };
 
   return (
-    <Background fullHeight color="HomePage grey100">
+    <Background fullHeight color="PreviewPage grey100">
       {showDrawer && (
         <div className="drawer">
           {showDrawer === "events" && (
@@ -444,7 +597,7 @@ function HomePage() {
       )}
 
       <div className="home-section">
-        <CardHeader hasPreviewButton={true} handleSave={handleSave}>
+        <CardHeader handleSave={handleSave}>
           <Typography variant="h3">Map your automation</Typography>
         </CardHeader>
         <div className="flow-body">
@@ -463,4 +616,4 @@ function HomePage() {
   );
 }
 
-export default HomePage;
+export default PreviewPage;
