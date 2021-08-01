@@ -8,9 +8,9 @@ import { Background } from "components/common/Background/Background";
 import { CardHeader } from "components/common/CardHeader/CardHeader";
 import { CardBody } from "components/common/CardBody/CardBody";
 import ButtonSelectorNode from "components/ButtonSelectorNode/ButtonSelectorNode";
+import { ACTIONS, CONDITIONS, EVENTS } from "constants/constants";
 
 import "./HomePage.scss";
-import { ACTIONS, CONDITIONS, EVENTS } from "constants/constants";
 
 const nodeTypes = {
   btnSelectorNode: ButtonSelectorNode
@@ -20,8 +20,8 @@ function HomePage() {
   const [showDrawer, setShowDrawer] = useState("events");
   const [selectedNode, setSelectedNode] = useState("1");
   const [selectedEvent, setSelectedEvent] = useState([]);
-  const [selectedCondition, setSelectedCondition] = useState([]);
-  const [selectedAction, setSelectedAction] = useState([]);
+  const [selectedCondition, setSelectedCondition] = useState({});
+  const [selectedAction, setSelectedAction] = useState({});
   const [clickedAction, setClickedAction] = useState(null);
 
   const initialElements = [
@@ -32,6 +32,10 @@ function HomePage() {
         label: "When",
         type: "event",
         btnLabel: "Select event trigger",
+        focusNodeAction: () => {
+          setShowDrawer("events");
+          setSelectedNode("1");
+        },
         btnAction: () => {
           setShowDrawer("events");
           setSelectedNode("1");
@@ -46,10 +50,157 @@ function HomePage() {
   const onConnect = params => setElements(els => addEdge(params, els));
   const elementsStateRef = useRef();
   elementsStateRef.current = elements;
+  const selectedNodeStateRef = useRef();
+  selectedNodeStateRef.current = selectedNode;
   const selConditionStateRef = useRef();
   selConditionStateRef.current = selectedCondition;
   const selActionStateRef = useRef();
-  selActionStateRef.current = selectedCondition;
+  selActionStateRef.current = selectedAction;
+
+  const generateNextStepNodeObj = (nodeId, position) => {
+    return {
+      label: `Next Step`,
+      type: "choice",
+      btnLabel: "Add condition",
+      focusNodeAction: () => {
+        setShowDrawer(null);
+        setSelectedNode(nodeId);
+      },
+      btnAction: () => {
+        setShowDrawer("conditions");
+        setSelectedNode(nodeId);
+
+        let tempElems = Object.assign([], elementsStateRef.current);
+        tempElems = tempElems.filter(
+          t =>
+            t.id !== nodeId &&
+            t.id !== `edges-${(Number(nodeId) - 1).toString()}-${nodeId}`
+        );
+        tempElems.push(
+          {
+            id: nodeId, // 2
+            type: "btnSelectorNode",
+            data: {
+              label: `If...`,
+              type: "condition",
+              btnLabel: "Add condition",
+              focusNodeAction: () => {
+                setShowDrawer("conditions");
+                setSelectedNode(nodeId);
+              },
+              btnAction: () => {
+                setShowDrawer("conditions");
+                setSelectedNode(nodeId);
+              },
+              handleDeleteCondition: itemId =>
+                handleDeleteCondition(nodeId, itemId)
+            },
+            position: position
+          },
+          {
+            id: (Number(nodeId) + 1).toString(), // 3
+            type: "btnSelectorNode",
+            data: {
+              label: `Then...`,
+              type: "action-yes",
+              btnLabel: "Add action",
+              focusNodeAction: () => {
+                setShowDrawer("actions");
+                setSelectedNode((Number(nodeId) + 1).toString());
+              },
+              btnAction: () => {
+                setShowDrawer("actions");
+                setSelectedNode((Number(nodeId) + 1).toString());
+              },
+              handleDeleteAction: itemId =>
+                handleDeleteAction((Number(nodeId) + 1).toString(), itemId)
+            },
+            position: { x: position.x, y: position.y + 400 }
+          },
+          {
+            id: (Number(nodeId) + 2).toString(), // 4
+            type: "btnSelectorNode",
+            data: generateNextStepNodeObj((Number(nodeId) + 2).toString(), {
+              x: position.x + 300,
+              y: position.y + 150
+            }),
+            position: { x: position.x + 300, y: position.y + 150 }
+          },
+          ...(nodeId === "2"
+            ? [
+                {
+                  id: `edges-${(Number(nodeId) - 1).toString()}-${nodeId}`, // edges-1-2
+                  source: (Number(nodeId) - 1).toString(),
+                  target: nodeId,
+                  type: "smoothstep"
+                }
+              ]
+            : []),
+          {
+            id: `edges-${nodeId}-${(Number(nodeId) + 1).toString()}`, // edges-2-3
+            source: nodeId,
+            target: (Number(nodeId) + 1).toString(),
+            type: "smoothstep",
+            label: "yes"
+          },
+          {
+            id: `edges-${nodeId}-${(Number(nodeId) + 2).toString()}`, // edges-2-4
+            source: nodeId,
+            target: (Number(nodeId) + 2).toString(),
+            type: "smoothstep",
+            label: "no"
+          }
+        );
+        setElements(tempElems);
+      },
+      btnLabel2: "Add Action",
+      btnAction2: () => {
+        setShowDrawer("actions");
+        setSelectedNode(nodeId);
+
+        let tempElems = Object.assign([], elementsStateRef.current);
+        tempElems = tempElems.filter(
+          t =>
+            t.id !== nodeId &&
+            t.id !== `edges-${(Number(nodeId) - 1).toString()}-${nodeId}` // edges-1-2
+        );
+        tempElems.push(
+          {
+            id: nodeId,
+            type: "btnSelectorNode",
+            data: {
+              label: `Then...`,
+              type: "action",
+              btnLabel: "Add action",
+              focusNodeAction: () => {
+                setShowDrawer("actions");
+                setSelectedNode(nodeId);
+              },
+              btnAction: () => {
+                setShowDrawer("actions");
+                setSelectedNode(nodeId);
+              },
+              handleDeleteAction: itemId => handleDeleteAction(nodeId, itemId)
+            },
+            position: position
+          },
+          ...(nodeId === "2"
+            ? [
+                {
+                  id: `edges-${(Number(nodeId) - 1).toString()}-${nodeId}`, // edges-1-2
+                  source: (Number(nodeId) - 1).toString(),
+                  target: nodeId,
+                  type: "smoothstep"
+                }
+              ]
+            : [])
+        );
+
+        setElements(tempElems);
+      },
+      handleDeleteCondition: itemId => handleDeleteCondition(nodeId, itemId)
+    };
+  };
 
   const handleEventChange = id => {
     setSelectedEvent([id]);
@@ -61,6 +212,10 @@ function HomePage() {
         label: "When",
         type: "event",
         event: EVENTS.find(e => e.id === id),
+        focusNodeAction: () => {
+          setShowDrawer("events");
+          setSelectedNode("1");
+        },
         btnAction: () => {
           setShowDrawer("events");
           setSelectedNode("1");
@@ -74,143 +229,7 @@ function HomePage() {
         {
           id: "2",
           type: "btnSelectorNode",
-          data: {
-            label: `Next Step`,
-            type: "condition",
-            btnLabel: "Add condition",
-            btnAction: () => {
-              setShowDrawer("conditions");
-              setSelectedNode("2");
-
-              let tempElems = Object.assign([], elementsStateRef.current);
-              tempElems = tempElems.filter(
-                t => t.id !== "2" && t.id !== "edges-1-2"
-              );
-              tempElems.push(
-                {
-                  id: "2",
-                  type: "btnSelectorNode",
-                  data: {
-                    label: `If...`,
-                    type: "condition",
-                    btnLabel: "Add condition",
-                    btnAction: () => {
-                      setShowDrawer("conditions");
-                      setSelectedNode("2");
-                    },
-                    handleDeleteCondition: itemId =>
-                      handleDeleteCondition("2", itemId)
-                  },
-                  position: { x: 250, y: 200 }
-                },
-                {
-                  id: "3",
-                  type: "btnSelectorNode",
-                  data: {
-                    label: `Then...`,
-                    type: "action-yes",
-                    // btnLabel: "Add condition",
-                    // btnAction: () => {
-                    //   setShowDrawer("conditions");
-                    //   setSelectedNode("3");
-                    // },
-                    btnLabel: "Add action",
-                    btnAction: () => {
-                      setShowDrawer("actions");
-                      setSelectedNode("3");
-                    },
-                    handleDeleteAction: itemId =>
-                      handleDeleteAction("3", itemId)
-                  },
-                  position: { x: 250, y: 600 }
-                },
-                {
-                  id: "4",
-                  type: "btnSelectorNode",
-                  data: {
-                    label: `Then...`,
-                    type: "action-no",
-                    // btnLabel: "Add condition",
-                    // btnAction: () => {
-                    //   setShowDrawer("conditions");
-                    //   setSelectedNode("4");
-                    // },
-                    btnLabel: "Add action",
-                    btnAction: () => {
-                      setShowDrawer("actions");
-                      setSelectedNode("4");
-                    },
-                    handleDeleteAction: itemId =>
-                      handleDeleteAction("4", itemId)
-                  },
-                  position: { x: 500, y: 350 }
-                },
-                {
-                  id: "edges-1-2",
-                  source: "1",
-                  target: "2",
-                  type: "smoothstep"
-                },
-                {
-                  id: "edges-2-3",
-                  source: "2",
-                  target: "3",
-                  type: "smoothstep",
-                  label: "yes"
-                },
-                {
-                  id: "edges-2-4",
-                  source: "2",
-                  target: "4",
-                  type: "smoothstep",
-                  label: "no"
-                }
-              );
-              setElements(tempElems);
-            },
-            btnLabel2: "Add Action",
-            btnAction2: () => {
-              setShowDrawer("actions");
-              setSelectedNode("2");
-
-              let tempElems = Object.assign([], elementsStateRef.current);
-              tempElems = tempElems.filter(
-                t => t.id !== "2" && t.id !== "edges-1-2"
-              );
-              tempElems.push(
-                {
-                  id: "2",
-                  type: "btnSelectorNode",
-                  data: {
-                    label: `Then...`,
-                    type: "action",
-                    // btnLabel: "Add condition",
-                    // btnAction: () => {
-                    //   setShowDrawer("conditions");
-                    //   setSelectedNode("3");
-                    // },
-                    btnLabel: "Add action",
-                    btnAction: () => {
-                      setShowDrawer("actions");
-                      setSelectedNode("2");
-                    },
-                    handleDeleteAction: itemId =>
-                      handleDeleteAction("2", itemId)
-                  },
-                  position: { x: 250, y: 200 }
-                },
-                {
-                  id: "edges-1-2",
-                  source: "1",
-                  target: "2",
-                  type: "smoothstep"
-                }
-              );
-
-              setElements(tempElems);
-            },
-            handleDeleteCondition: itemId => handleDeleteCondition("2", itemId)
-          },
+          data: generateNextStepNodeObj("2", { x: 250, y: 200 }),
           position: { x: 250, y: 200 }
         },
         {
@@ -226,7 +245,10 @@ function HomePage() {
   };
 
   const handleConditionChange = id => {
-    setSelectedCondition([...selectedCondition, id]);
+    setSelectedCondition(prev => ({
+      ...prev,
+      [selectedNode]: [...(selectedCondition[selectedNode] || []), id]
+    }));
     let tempElems = Object.assign([], elements);
     let tempElemIndex = tempElems.findIndex(t => t.id === selectedNode);
     tempElems[tempElemIndex] = {
@@ -247,7 +269,13 @@ function HomePage() {
   };
 
   const handleAddAction = () => {
-    setSelectedAction([...selectedAction, clickedAction.id]);
+    setSelectedAction(prev => ({
+      ...prev,
+      [selectedNode]: [
+        ...(selectedAction[selectedNode] || []),
+        clickedAction.id
+      ]
+    }));
     let tempElems = Object.assign([], elements);
     let tempElemIndex = tempElems.findIndex(t => t.id === selectedNode);
     tempElems[tempElemIndex] = {
@@ -275,9 +303,12 @@ function HomePage() {
         )
       }
     };
-    setSelectedCondition(
-      selConditionStateRef.current.filter(c => c !== itemId)
-    );
+    setSelectedCondition({
+      ...selConditionStateRef.current,
+      [selectedNodeStateRef.current]: (
+        selConditionStateRef.current[selectedNodeStateRef.current] || []
+      ).filter(c => c !== itemId)
+    });
     setElements(tempElems);
   };
 
@@ -293,7 +324,12 @@ function HomePage() {
         )
       }
     };
-    setSelectedAction(selActionStateRef.current.filter(a => a !== itemId));
+    setSelectedAction({
+      ...selActionStateRef.current,
+      [selectedNodeStateRef.current]: (
+        selActionStateRef.current[selectedNodeStateRef.current] || []
+      ).filter(a => a !== itemId)
+    });
     setElements(tempElems);
   };
 
@@ -309,7 +345,6 @@ function HomePage() {
           outputArr.push({ condition: node.data.conditions });
           break;
         case "action-yes":
-        case "action-no":
         case "action":
           outputArr.push({ [node.data.type]: [...node.data.actions] });
           break;
@@ -330,6 +365,8 @@ function HomePage() {
                 <Typography variant="h3">Events</Typography>
               </CardHeader>
               <CardBody
+                type="events"
+                nodeId={selectedNode}
                 listItems={EVENTS}
                 selectedId={selectedEvent}
                 handleSelect={handleEventChange}
@@ -343,6 +380,8 @@ function HomePage() {
                 <Typography variant="h3">Conditions</Typography>
               </CardHeader>
               <CardBody
+                type="conditions"
+                nodeId={selectedNode}
                 listItems={CONDITIONS}
                 selectedId={selectedCondition}
                 handleSelect={handleConditionChange}
@@ -356,6 +395,8 @@ function HomePage() {
                 <Typography variant="h3">Actions</Typography>
               </CardHeader>
               <CardBody
+                type="actions"
+                nodeId={selectedNode}
                 listItems={ACTIONS}
                 selectedId={selectedAction}
                 onFocusId={clickedAction?.id}

@@ -7,7 +7,15 @@ import "./CardBody.scss";
 
 const CardBody = props => {
   const [showMore, setShowMore] = useState(false);
-  const { listItems, selectedId, onFocusId, handleSelect, ...rest } = props;
+  const {
+    type,
+    listItems,
+    nodeId,
+    selectedId,
+    onFocusId,
+    handleSelect,
+    ...rest
+  } = props;
   return (
     <>
       <div
@@ -16,22 +24,23 @@ const CardBody = props => {
         }`}
         {...rest}
       >
-        {listItems
-          .filter(x => !selectedId.includes(x.id))
-          .map(item => (
-            <Button
-              key={item.id}
-              onClick={() => handleSelect(item.id)}
-              disableRipple
-              variant="text"
-              className={`btn-card-item ${
-                onFocusId === item.id ? "on-focus" : ""
-              }`}
-              startIcon={<AddBoxOutlinedIcon />}
-            >
-              {item.name}
-            </Button>
-          ))}
+        {(type === "actions" || type === "conditions"
+          ? listItems.filter(x => !selectedId[nodeId]?.includes(x.id))
+          : listItems.filter(x => !selectedId.includes(x.id))
+        ).map(item => (
+          <Button
+            key={item.id}
+            onClick={() => handleSelect(item.id)}
+            disableRipple
+            variant="text"
+            className={`btn-card-item ${
+              onFocusId === item.id ? "on-focus" : ""
+            }`}
+            startIcon={<AddBoxOutlinedIcon />}
+          >
+            {item.name}
+          </Button>
+        ))}
       </div>
       {listItems.length > 3 && (
         <div className="btn-show-more">

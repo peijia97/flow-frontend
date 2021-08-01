@@ -16,69 +16,103 @@ export default memo(({ id, data, isConnectable }) => {
       className={`ButtonSelectorNode ${
         selectedElements && selectedElements[0].id === id ? "is-selected" : ""
       }`}
-      onClick={() => data.btnAction()}
+      onClick={() => data.focusNodeAction()}
     >
       <div>
         <Typography variant="body1">{data.label}</Typography>
       </div>
-      {data.event && (
-        <Button variant="contained" disabled className="lbl-event">
-          {data.event.name}
-        </Button>
-      )}
-
-      {data.conditions?.length > 0 &&
-        data.conditions.map((c, i) => (
-          <React.Fragment key={c.id}>
-            <div className="label-div">
-              <Button variant="contained" disabled className="lbl-condition">
-                {c.name}
-                {/* {data.conditionLabel.join(" AND ")} */}
-              </Button>
-              <IconButton
-                disableRipple
-                onClick={() => data.handleDeleteCondition(c.id)}
-              >
-                <HighlightOffIcon />
-              </IconButton>
-              {i !== data.conditions.length - 1 && (
-                <Typography variant="h6">AND</Typography>
-              )}
-            </div>
-          </React.Fragment>
+      {data.type === "event" &&
+        (data.event ? (
+          <Button variant="contained" disabled className="lbl-event">
+            {data.event.name}
+          </Button>
+        ) : (
+          data.btnLabel && (
+            <Button
+              onClick={e => {
+                data.btnAction();
+                e.stopPropagation();
+              }}
+              variant="contained"
+            >
+              {data.btnLabel}
+            </Button>
+          )
         ))}
 
-      {data.actions?.length > 0 &&
-        data.actions.map((a, i) => (
-          <React.Fragment key={a.id}>
-            <div className="label-div">
-              <Button variant="contained" disabled className="lbl-action">
-                {a.name} - {a.value}
-                {/* {data.actionLabel.join(" AND ")} */}
-              </Button>
-              <IconButton
-                disableRipple
-                onClick={() => data.handleDeleteAction(a.id)}
+      {(data.type === "condition" || data.type === "choice") &&
+        (data.conditions?.length > 0
+          ? data.conditions.map((c, i) => (
+              <React.Fragment key={c.id}>
+                <div className="label-div">
+                  <Button
+                    variant="contained"
+                    disabled
+                    className="lbl-condition"
+                  >
+                    {c.name}
+                  </Button>
+                  <IconButton
+                    disableRipple
+                    onClick={() => data.handleDeleteCondition(c.id)}
+                  >
+                    <HighlightOffIcon />
+                  </IconButton>
+                  {i !== data.conditions.length - 1 && (
+                    <Typography variant="h6">AND</Typography>
+                  )}
+                </div>
+              </React.Fragment>
+            ))
+          : data.btnLabel && (
+              <Button
+                onClick={e => {
+                  data.btnAction();
+                  e.stopPropagation();
+                }}
+                variant="contained"
               >
-                <HighlightOffIcon />
-              </IconButton>
-              {i !== data.actions.length - 1 && (
-                <Typography variant="h6">AND</Typography>
-              )}
-            </div>
-          </React.Fragment>
-        ))}
+                {data.btnLabel}
+              </Button>
+            ))}
 
-      {data.btnLabel && (
-        <Button
-          onClick={e => {
-            data.btnAction();
-            e.stopPropagation();
-          }}
-          variant="contained"
-        >
-          {data.btnLabel}
-        </Button>
+      {/* type === 'action' || type === 'action-yes' */}
+      {data.type.includes("action") &&
+        (data.actions?.length > 0
+          ? data.actions.map((a, i) => (
+              <React.Fragment key={a.id}>
+                <div className="label-div">
+                  <Button variant="contained" disabled className="lbl-action">
+                    {a.name} - {a.value}
+                  </Button>
+                  <IconButton
+                    disableRipple
+                    onClick={() => data.handleDeleteAction(a.id)}
+                  >
+                    <HighlightOffIcon />
+                  </IconButton>
+                  {i !== data.actions.length - 1 && (
+                    <Typography variant="h6">AND</Typography>
+                  )}
+                </div>
+              </React.Fragment>
+            ))
+          : data.btnLabel && (
+              <Button
+                onClick={e => {
+                  data.btnAction();
+                  e.stopPropagation();
+                }}
+                variant="contained"
+              >
+                {data.btnLabel}
+              </Button>
+            ))}
+
+      {data.type === "choice" && (
+        <Typography variant="h6" className="text-or">
+          OR
+        </Typography>
       )}
 
       {data.btnLabel2 && (
