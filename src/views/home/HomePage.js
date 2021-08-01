@@ -355,6 +355,13 @@ function HomePage() {
     console.log("output", outputArr);
   };
 
+  // Handle lose focus on node to hide drawer
+  const handleOnSelectionChange = e => {
+    if (!e) {
+      setShowDrawer(null);
+    }
+  };
+
   return (
     <Background fullHeight color="HomePage grey100">
       {showDrawer && (
@@ -448,6 +455,7 @@ function HomePage() {
             onConnect={onConnect}
             nodeTypes={nodeTypes}
             deleteKeyCode={46} /* 'delete'-key */
+            onSelectionChange={handleOnSelectionChange}
           />
         </div>
       </div>
