@@ -67,7 +67,7 @@ export default memo(({ id, data, isConnectable }) => {
           : data.btnLabel && (
               <Button
                 onClick={e => {
-                  data.btnAction();
+                  data.btnAction(id);
                   e.stopPropagation();
                 }}
                 variant="contained"
@@ -100,7 +100,7 @@ export default memo(({ id, data, isConnectable }) => {
           : data.btnLabel && (
               <Button
                 onClick={e => {
-                  data.btnAction();
+                  data.btnAction(id);
                   e.stopPropagation();
                 }}
                 variant="contained"
@@ -118,7 +118,7 @@ export default memo(({ id, data, isConnectable }) => {
       {data.btnLabel2 && (
         <Button
           onClick={e => {
-            data.btnAction2();
+            data.btnAction2(id);
             e.stopPropagation();
           }}
           variant="contained"

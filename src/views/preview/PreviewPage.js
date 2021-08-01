@@ -306,9 +306,9 @@ function PreviewPage() {
         setElements(tempElems);
       },
       btnLabel2: "Add Action",
-      btnAction2: () => {
+      btnAction2: id => {
         setShowDrawer("actions");
-        setSelectedNode(nodeId);
+        setSelectedNode(id);
 
         let tempElems = Object.assign([], elementsStateRef.current);
         tempElems = tempElems.filter(

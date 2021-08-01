@@ -154,9 +154,9 @@ function HomePage() {
         setElements(tempElems);
       },
       btnLabel2: "Add Action",
-      btnAction2: () => {
+      btnAction2: id => {
         setShowDrawer("actions");
-        setSelectedNode(nodeId);
+        setSelectedNode(id);
 
         let tempElems = Object.assign([], elementsStateRef.current);
         tempElems = tempElems.filter(
@@ -256,9 +256,9 @@ function HomePage() {
     tempElems[tempElemIndex] = {
       ...tempElems[tempElemIndex],
       data: {
-        ...tempElems[tempElemIndex].data,
+        ...tempElems[tempElemIndex]?.data,
         conditions: [
-          ...(tempElems[tempElemIndex].data?.conditions || []),
+          ...(tempElems[tempElemIndex]?.data?.conditions || []),
           CONDITIONS.find(e => e.id === id)
         ]
       }
@@ -283,9 +283,9 @@ function HomePage() {
     tempElems[tempElemIndex] = {
       ...tempElems[tempElemIndex],
       data: {
-        ...tempElems[tempElemIndex].data,
+        ...tempElems[tempElemIndex]?.data,
         actions: [
-          ...(tempElems[tempElemIndex].data?.actions || []),
+          ...(tempElems[tempElemIndex]?.data?.actions || []),
           clickedAction
         ]
       }
@@ -299,8 +299,8 @@ function HomePage() {
     tempElems[tempElemIndex] = {
       ...tempElems[tempElemIndex],
       data: {
-        ...tempElems[tempElemIndex].data,
-        conditions: (tempElems[tempElemIndex].data?.conditions || []).filter(
+        ...tempElems[tempElemIndex]?.data,
+        conditions: (tempElems[tempElemIndex]?.data?.conditions || []).filter(
           t => t.id !== itemId
         )
       }
