@@ -1,12 +1,5 @@
 @import "src/scss/_variables";
 
-%shared-card-body {
-  padding: 0.8rem 1.5rem;
-  border-bottom-left-radius: 1rem;
-  border-bottom-right-radius: 1rem;
-  margin-bottom: 1rem;
-}
-
 .CardBody {
   @extend %shared-card-body;
   display: flex;

@@ -17,3 +17,10 @@ $grey600: #718096;
 $grey700: #4a5568;
 $grey800: #2d3748;
 $grey900: #1a202c;
+
+%shared-card-body {
+  padding: 0.8rem 1.5rem;
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  margin-bottom: 1rem;
+}

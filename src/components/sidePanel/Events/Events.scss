@@ -1,0 +1,35 @@
+@import "src/scss/_variables";
+
+.Events {
+  .content-body {
+    @extend %shared-card-body;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+    width: inherit;
+    background-color: white;
+    &.has-show-more {
+      max-height: 7rem;
+      overflow: hidden;
+      margin-bottom: 0.3rem;
+      border-radius: 0;
+    }
+
+    &.show-all {
+      max-height: inherit;
+    }
+  }
+
+  .btn-show-more {
+    @extend %shared-card-body;
+    background-color: white;
+    text-align: center;
+
+    .MuiButton-text {
+      font-size: 1rem;
+      color: $grey900 !important;
+      font-weight: bold !important;
+    }
+  }
+}
