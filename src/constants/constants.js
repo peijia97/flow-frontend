@@ -32,13 +32,13 @@ export const SAMPLE_EVENT_TRIGGERS = [
     fields: [
       {
         conditionKey: "ProductTitle",
-        conditionDisplay: "Product title",
+        conditionDisplay: "Product Title",
         type: "string"
       },
       {
         conditionKey: "ProductAmount",
         conditionDisplay: "Product Amount",
-        type: "decimal"
+        type: "int"
       }
     ]
   },
@@ -108,7 +108,7 @@ export const SAMPLE_FLOW = {
                 operator: "contains"
               },
               {
-                conditionKey: "Amount",
+                conditionKey: "ProductAmount",
                 value: ["30"],
                 operator: ">="
               }

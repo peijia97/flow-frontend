@@ -124,7 +124,7 @@ const Actions = props => {
           <div className="card-body">
             {clickedAction.fields.map(field =>
               field.type === "selection" ? (
-                <FormControl key={field.key} className="">
+                <FormControl key={field.key}>
                   <InputLabel id={`label-${field.key}`}>
                     {field.placeHolder}
                   </InputLabel>
@@ -154,7 +154,7 @@ const Actions = props => {
                 />
               )
             )}
-            <Button variatn="text" disableRipple onClick={handleOnAdd}>
+            <Button variant="text" disableRipple onClick={handleOnAdd}>
               Add
             </Button>
           </div>
