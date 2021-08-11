@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
@@ -19,32 +19,46 @@ import {
 import "./Conditions.scss";
 
 const Conditions = props => {
-  const { selectedEventKey, mustMeetKey, handleSelect, ...rest } = props;
-  const [mustMeet, setMustMeet] = useState("Fn::Or");
+  const { selectedEventKey, selectedConditionObj, handleSelect, ...rest } =
+    props;
+
+  useEffect(() => {
+    setConditions(
+      Object.keys(selectedConditionObj)[0]?.includes("Fn::")
+        ? Object.values(selectedConditionObj)[0]
+        : [
+            {
+              conditionKey: selectedConditionObj.conditionKey || "",
+              value: selectedConditionObj.value || [],
+              operator: selectedConditionObj.operator || ""
+            }
+          ]
+    );
+    setMustMeet(
+      Object.keys(selectedConditionObj)[0]?.includes("Fn::")
+        ? Object.keys(selectedConditionObj)[0]
+        : ""
+    );
+  }, [selectedConditionObj]);
+
   const initialConditionObj = {
     conditionKey: "",
     value: [],
     operator: ""
   };
+
+  const selectedEventFields = SAMPLE_EVENT_TRIGGERS.find(
+    t => t.eventKey === selectedEventKey
+  ).fields;
+
+  const [mustMeet, setMustMeet] = useState("");
   const [conditions, setConditions] = useState([
     {
-      conditionKey: "ProductTitle",
-      value: ["coke", "pepsi"],
-      operator: "contains"
-    },
-    {
-      conditionKey: "ProductAmount",
-      value: ["30"],
-      operator: ">="
+      conditionKey: "",
+      value: [],
+      operator: ""
     }
   ]);
-  // const [conditions, setConditions] = useState([
-  //   {
-  //     conditionKey: "",
-  //     value: [],
-  //     operator: ""
-  //   }
-  // ]);
 
   const handleOnAdd = () => {
     if (!mustMeet) {
@@ -54,8 +68,8 @@ const Conditions = props => {
   };
 
   const handleOnSave = () => {
-    const result = mustMeet ? { [mustMeet]: conditions } : conditions;
-    console.log(result);
+    const result = mustMeet ? { [mustMeet]: conditions } : conditions[0];
+    handleSelect(result);
   };
 
   const handleOnRemove = index => {
@@ -126,9 +140,7 @@ const Conditions = props => {
                   handleOnChange(e.target.value, i, "conditionKey")
                 }
               >
-                {SAMPLE_EVENT_TRIGGERS.find(
-                  t => t.eventKey === selectedEventKey
-                ).fields.map(item => (
+                {selectedEventFields.map(item => (
                   <MenuItem key={item.conditionKey} value={item.conditionKey}>
                     {item.conditionDisplay}
                   </MenuItem>
@@ -146,17 +158,27 @@ const Conditions = props => {
                 value={c.operator || ""}
                 onChange={e => handleOnChange(e.target.value, i, "operator")}
               >
-                {CONDITION_OPERATORS.filter(
-                  o =>
-                    o.type ===
-                    SAMPLE_EVENT_TRIGGERS.find(
-                      t => t.eventKey === selectedEventKey
-                    ).fields.find(f => f.conditionKey === c.conditionKey)?.type
-                )?.map(operator => (
-                  <MenuItem key={operator.value} value={operator.value}>
-                    {operator.name}
-                  </MenuItem>
-                ))}
+                {selectedEventFields.find(
+                  f => f.conditionKey === c.conditionKey
+                )?.type === "option"
+                  ? selectedEventFields
+                      .find(f => f.conditionKey === c.conditionKey)
+                      .options.map(option => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))
+                  : CONDITION_OPERATORS.filter(
+                      o =>
+                        o.type ===
+                        selectedEventFields.find(
+                          f => f.conditionKey === c.conditionKey
+                        )?.type
+                    )?.map(operator => (
+                      <MenuItem key={operator.value} value={operator.value}>
+                        {operator.name}
+                      </MenuItem>
+                    ))}
               </Select>
             </FormControl>
 
@@ -201,8 +223,7 @@ const Conditions = props => {
 
 Conditions.propTypes = {
   selectedEventKey: PropTypes.string,
-  mustMeetKey: PropTypes.string,
-  onFocusId: PropTypes.string,
+  selectedConditionObj: PropTypes.object,
   handleSelect: PropTypes.func
 };
 export { Conditions };

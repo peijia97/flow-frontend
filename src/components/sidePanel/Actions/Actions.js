@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
@@ -16,7 +16,25 @@ import { SAMPLE_ACTIONS } from "constants/constants";
 import "./Actions.scss";
 
 const Actions = props => {
-  const { handleSelect, handleAddAction, onFocusObject, ...rest } = props;
+  const { handleSelect, handleAddAction, selectedActionObj, ...rest } = props;
+
+  useEffect(() => {
+    setClickedAction(formatActionInputs(selectedActionObj));
+  }, [selectedActionObj]);
+
+  // {
+  //   actionKey: "CallContact",
+  //   actionInputs: [
+  //     {
+  //       key: "callContact",
+  //       value: "0123456789"
+  //     },
+  //     {
+  //       key: "callContactCountry",
+  //       value: "Singapore"
+  //     }
+  //   ]
+  // }
 
   const formatActionInputs = onFocusObj => {
     const tempAction =
@@ -29,21 +47,7 @@ const Actions = props => {
     return tempAction;
   };
 
-  const [clickedAction, setClickedAction] = useState(() =>
-    formatActionInputs({
-      actionKey: "CallContact",
-      actionInputs: [
-        {
-          key: "callContact",
-          value: "0123456789"
-        },
-        {
-          key: "callContactCountry",
-          value: "Singapore"
-        }
-      ]
-    })
-  );
+  const [clickedAction, setClickedAction] = useState({});
   const [showMore, setShowMore] = useState(false);
 
   const handleOnClickAction = action => {
@@ -58,6 +62,7 @@ const Actions = props => {
         value: f.value
       }))
     };
+    handleSelect(result);
   };
 
   const handleFieldInputChange = (e, field) => {
@@ -167,6 +172,6 @@ const Actions = props => {
 Actions.propTypes = {
   handleSelect: PropTypes.func,
   handleAddAction: PropTypes.func,
-  onFocusObject: PropTypes.string
+  selectedActionObj: PropTypes.string
 };
 export { Actions };
