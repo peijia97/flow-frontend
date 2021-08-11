@@ -11,7 +11,7 @@ import { SAMPLE_EVENT_TRIGGERS } from "constants/constants";
 import "./Events.scss";
 
 const Events = props => {
-  const { handleSelect, onFocusId, ...rest } = props;
+  const { handleSelect, selectedEventKey, ...rest } = props;
   const [showMore, setShowMore] = useState(false);
 
   return (
@@ -29,11 +29,11 @@ const Events = props => {
         {SAMPLE_EVENT_TRIGGERS.map(item => (
           <Button
             key={item.eventKey}
-            onClick={() => handleSelect(item.eventKey)}
+            onClick={() => handleSelect(item)}
             disableRipple
             variant="text"
             className={`btn-card-item ${
-              onFocusId === item.eventKey ? "on-focus" : ""
+              selectedEventKey === item.eventKey ? "on-focus" : ""
             }`}
             startIcon={<AddBoxOutlinedIcon />}
           >
@@ -65,7 +65,7 @@ const Events = props => {
 };
 
 Events.propTypes = {
-  onFocusId: PropTypes.string,
+  selectedEventKey: PropTypes.string,
   handleSelect: PropTypes.func
 };
 export { Events };
