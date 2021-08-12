@@ -43,7 +43,7 @@ export default memo(({ id, data, isConnectable }) => {
 
       {(data.type === "condition" || data.type === "choice") &&
         (data.item ? (
-          <Button variant="contained" disabled className="lbl-event">
+          <Button variant="contained" disabled className="lbl-condition">
             {Object.keys(data.item)[0].includes("Fn::")
               ? Object.values(data.item)[0]
                   .map(
@@ -97,17 +97,17 @@ export default memo(({ id, data, isConnectable }) => {
       {data.type.includes("action") &&
         (data.item
           ? data.item.map((a, i) => (
-              <React.Fragment key={a.id}>
+              <React.Fragment key={i}>
                 <div className="label-div">
                   <Button variant="contained" disabled className="lbl-action">
-                    {`${a.actionKey} 
+                    {`Action: ${a.actionKey}
                     ${a.actionInputs
                       .map(ai => `${ai.key} - ${ai.value}`)
                       .join(", ")}`}
                   </Button>
                   <IconButton
                     disableRipple
-                    onClick={() => data.handleDeleteAction(a.id)}
+                    onClick={() => data.handleDeleteAction(i)}
                   >
                     <HighlightOffIcon />
                   </IconButton>

@@ -172,6 +172,6 @@ const Actions = props => {
 Actions.propTypes = {
   handleSelect: PropTypes.func,
   handleAddAction: PropTypes.func,
-  selectedActionObj: PropTypes.string
+  selectedActionObj: PropTypes.object
 };
 export { Actions };

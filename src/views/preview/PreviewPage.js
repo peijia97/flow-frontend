@@ -583,7 +583,7 @@ function PreviewPage() {
                       label={clickedAction.label}
                     />
                     <Button
-                      variatn="text"
+                      variant="text"
                       disableRipple
                       onClick={handleAddAction}
                     >

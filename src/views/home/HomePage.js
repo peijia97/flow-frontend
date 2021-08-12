@@ -1,14 +1,13 @@
 import React, { useState, useRef } from "react";
 import ReactFlow, { removeElements, addEdge } from "react-flow-renderer";
 
-import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
-import TextField from "@material-ui/core/TextField";
+import { Events } from "components/sidePanel/Events/Events";
+import { Conditions } from "components/sidePanel/Conditions/Conditions";
+import { Actions } from "components/sidePanel/Actions/Actions";
 import { Background } from "components/common/Background/Background";
 import { CardHeader } from "components/common/CardHeader/CardHeader";
-import { CardBody } from "components/common/CardBody/CardBody";
 import ButtonSelectorNode from "components/ButtonSelectorNode/ButtonSelectorNode";
-import { ACTIONS, CONDITIONS, EVENTS } from "constants/constants";
 
 import "./HomePage.scss";
 
@@ -17,10 +16,9 @@ const nodeTypes = {
 };
 
 function HomePage() {
+  const [flow, setFlow] = useState({});
   const [showDrawer, setShowDrawer] = useState("events");
   const [selectedNode, setSelectedNode] = useState("1");
-  const [selectedEvent, setSelectedEvent] = useState([]);
-  const [selectedCondition, setSelectedCondition] = useState({});
   const [selectedAction, setSelectedAction] = useState({});
   const [clickedAction, setClickedAction] = useState(null);
 
@@ -52,8 +50,6 @@ function HomePage() {
   elementsStateRef.current = elements;
   const selectedNodeStateRef = useRef();
   selectedNodeStateRef.current = selectedNode;
-  const selConditionStateRef = useRef();
-  selConditionStateRef.current = selectedCondition;
   const selActionStateRef = useRef();
   selActionStateRef.current = selectedAction;
 
@@ -91,9 +87,9 @@ function HomePage() {
               btnAction: id => {
                 setShowDrawer("conditions");
                 setSelectedNode(id);
-              },
-              handleDeleteCondition: (nodeId, itemId) =>
-                handleDeleteCondition(nodeId, itemId)
+              }
+              // handleDeleteCondition: (nodeId, itemId) =>
+              //   handleDeleteCondition(nodeId, itemId)
             },
             position: position
           },
@@ -112,8 +108,8 @@ function HomePage() {
                 setShowDrawer("actions");
                 setSelectedNode(id);
               },
-              handleDeleteAction: (nodeId, itemId) =>
-                handleDeleteAction(nodeId, itemId)
+              handleDeleteAction: itemIndex =>
+                handleDeleteAction(nodeId, itemIndex)
             },
             position: { x: position.x, y: position.y + 400 }
           },
@@ -180,8 +176,8 @@ function HomePage() {
                 setShowDrawer("actions");
                 setSelectedNode(id);
               },
-              handleDeleteAction: (nodeId, itemId) =>
-                handleDeleteAction(nodeId, itemId)
+              handleDeleteAction: itemIndex =>
+                handleDeleteAction(nodeId, itemIndex)
             },
             position: position
           },
@@ -198,14 +194,14 @@ function HomePage() {
         );
 
         setElements(tempElems);
-      },
-      handleDeleteCondition: (nodeId, itemId) =>
-        handleDeleteCondition(nodeId, itemId)
+      }
+      // handleDeleteCondition: (nodeId, itemId) =>
+      //   handleDeleteCondition(nodeId, itemId)
     };
   };
 
-  const handleEventChange = id => {
-    setSelectedEvent([id]);
+  const handleEventChange = event => {
+    setFlow({ ...flow, eventKey: event.eventKey });
     let tempElems = Object.assign([], elements);
     tempElems[0] = {
       id: "1",
@@ -213,7 +209,7 @@ function HomePage() {
       data: {
         label: "When",
         type: "event",
-        event: EVENTS.find(e => e.id === id),
+        item: event,
         focusNodeAction: id => {
           setShowDrawer("events");
           setSelectedNode(id);
@@ -246,28 +242,34 @@ function HomePage() {
     setElements(tempElems);
   };
 
-  const handleConditionChange = id => {
-    setSelectedCondition(prev => ({
-      ...prev,
-      [selectedNode]: [...(selectedCondition[selectedNode] || []), id]
-    }));
+  const handleConditionChange = conditionObj => {
+    // setSelectedCondition(prev => ({
+    //   ...prev,
+    //   [selectedNode]: [...(selectedCondition[selectedNode] || []), id]
+    // }));
     let tempElems = Object.assign([], elements);
     let tempElemIndex = tempElems.findIndex(t => t.id === selectedNode);
     tempElems[tempElemIndex] = {
       ...tempElems[tempElemIndex],
       data: {
         ...tempElems[tempElemIndex]?.data,
-        conditions: [
-          ...(tempElems[tempElemIndex]?.data?.conditions || []),
-          CONDITIONS.find(e => e.id === id)
-        ]
+        item: conditionObj
       }
     };
     setElements(tempElems);
   };
 
-  const handleActionChange = id => {
-    setClickedAction(ACTIONS.find(a => a.id === id));
+  const handleActionChange = actionObj => {
+    let tempElems = Object.assign([], elements);
+    let tempElemIndex = tempElems.findIndex(t => t.id === selectedNode);
+    tempElems[tempElemIndex] = {
+      ...tempElems[tempElemIndex],
+      data: {
+        ...tempElems[tempElemIndex]?.data,
+        item: [...(tempElems[tempElemIndex]?.data?.item || []), actionObj]
+      }
+    };
+    setElements(tempElems);
   };
 
   const handleAddAction = () => {
@@ -293,45 +295,39 @@ function HomePage() {
     setElements(tempElems);
   };
 
-  const handleDeleteCondition = (nodeId, itemId) => {
-    let tempElems = Object.assign([], elementsStateRef.current);
-    let tempElemIndex = tempElems.findIndex(t => t.id === nodeId);
-    tempElems[tempElemIndex] = {
-      ...tempElems[tempElemIndex],
-      data: {
-        ...tempElems[tempElemIndex]?.data,
-        conditions: (tempElems[tempElemIndex]?.data?.conditions || []).filter(
-          t => t.id !== itemId
-        )
-      }
-    };
-    setSelectedCondition({
-      ...selConditionStateRef.current,
-      [selectedNodeStateRef.current]: (
-        selConditionStateRef.current[selectedNodeStateRef.current] || []
-      ).filter(c => c !== itemId)
-    });
-    setElements(tempElems);
-  };
+  // const handleDeleteCondition = (nodeId, itemId) => {
+  //   let tempElems = Object.assign([], elementsStateRef.current);
+  //   let tempElemIndex = tempElems.findIndex(t => t.id === nodeId);
+  //   tempElems[tempElemIndex] = {
+  //     ...tempElems[tempElemIndex],
+  //     data: {
+  //       ...tempElems[tempElemIndex]?.data,
+  //       conditions: (tempElems[tempElemIndex]?.data?.conditions || []).filter(
+  //         t => t.id !== itemId
+  //       )
+  //     }
+  //   };
+  //   setSelectedCondition({
+  //     ...selConditionStateRef.current,
+  //     [selectedNodeStateRef.current]: (
+  //       selConditionStateRef.current[selectedNodeStateRef.current] || []
+  //     ).filter(c => c !== itemId)
+  //   });
+  //   setElements(tempElems);
+  // };
 
-  const handleDeleteAction = (nodeId, itemId) => {
+  const handleDeleteAction = (nodeId, itemIndex) => {
     let tempElems = Object.assign([], elementsStateRef.current);
-    let tempElemIndex = tempElems.findIndex(t => t.id === nodeId);
-    tempElems[tempElemIndex] = {
-      ...tempElems[tempElemIndex],
-      data: {
-        ...tempElems[tempElemIndex].data,
-        actions: (tempElems[tempElemIndex].data?.actions || []).filter(
-          t => t.id !== itemId
-        )
-      }
-    };
-    setSelectedAction({
-      ...selActionStateRef.current,
-      [selectedNodeStateRef.current]: (
-        selActionStateRef.current[selectedNodeStateRef.current] || []
-      ).filter(a => a !== itemId)
-    });
+    (tempElems.find(el => el.id === nodeId).data?.item || []).splice(
+      itemIndex,
+      1
+    );
+    // setSelectedAction({
+    //   ...selActionStateRef.current,
+    //   [selectedNodeStateRef.current]: (
+    //     selActionStateRef.current[selectedNodeStateRef.current] || []
+    //   ).filter(a => a !== itemId)
+    // });
     setElements(tempElems);
   };
 
@@ -369,84 +365,104 @@ function HomePage() {
       {showDrawer && (
         <div className="drawer">
           {showDrawer === "events" && (
-            <>
-              <CardHeader>
-                <Typography variant="h3">Events</Typography>
-              </CardHeader>
-              <CardBody
-                type="events"
-                nodeId={selectedNode}
-                listItems={EVENTS}
-                selectedId={selectedEvent}
-                handleSelect={handleEventChange}
-              />
-            </>
+            <Events
+              selectedEventKey={flow.eventKey}
+              handleSelect={handleEventChange}
+            />
+            // <Actions />
+            // <>
+            //   <CardHeader>
+            //     <Typography variant="h3">Events</Typography>
+            //   </CardHeader>
+            //   <CardBody
+            //     type="events"
+            //     nodeId={selectedNode}
+            //     listItems={EVENTS}
+            //     selectedId={selectedEvent}
+            //     handleSelect={handleEventChange}
+            //   />
+            // </>
           )}
 
           {showDrawer === "conditions" && (
-            <>
-              <CardHeader>
-                <Typography variant="h3">Conditions</Typography>
-              </CardHeader>
-              <CardBody
-                type="conditions"
-                nodeId={selectedNode}
-                listItems={CONDITIONS}
-                selectedId={selectedCondition}
-                handleSelect={handleConditionChange}
-              />
-            </>
+            <Conditions
+              selectedEventKey={flow.eventKey}
+              selectedConditionObj={
+                elements.find(el => el.id === selectedNodeStateRef.current)
+                  ?.data?.item || {}
+              }
+              handleSelect={handleConditionChange}
+            />
+            // <>
+            //   <CardHeader>
+            //     <Typography variant="h3">Conditions</Typography>
+            //   </CardHeader>
+            //   <CardBody
+            //     type="conditions"
+            //     nodeId={selectedNode}
+            //     listItems={CONDITIONS}
+            //     selectedId={selectedCondition}
+            //     handleSelect={handleConditionChange}
+            //   />
+            // </>
           )}
 
           {showDrawer === "actions" && (
-            <>
-              <CardHeader>
-                <Typography variant="h3">Actions</Typography>
-              </CardHeader>
-              <CardBody
-                type="actions"
-                nodeId={selectedNode}
-                listItems={ACTIONS}
-                selectedId={selectedAction}
-                onFocusId={clickedAction?.id}
-                handleSelect={handleActionChange}
-              />
-              {clickedAction && (
-                <>
-                  <CardHeader>
-                    <Typography variant="h3">Action Details</Typography>
-                  </CardHeader>
-                  <div className="card-body">
-                    <TextField
-                      fullWidth
-                      margin="dense"
-                      onChange={e =>
-                        setClickedAction(prev => ({
-                          ...prev,
-                          value: e.target.value
-                        }))
-                      }
-                      type={clickedAction.type}
-                      value={clickedAction.value || ""}
-                      label={clickedAction.label}
-                    />
-                    <Button
-                      variatn="text"
-                      disableRipple
-                      onClick={handleAddAction}
-                    >
-                      Add
-                    </Button>
-                  </div>
-                </>
-              )}
-            </>
+            <Actions
+              selectedActionObj={
+                elements.find(el => el.id === selectedNodeStateRef.current)
+                  ?.data?.item || {}
+              }
+              handleSelect={handleActionChange}
+            />
+            // <>
+            //   <CardHeader>
+            //     <Typography variant="h3">Actions</Typography>
+            //   </CardHeader>
+            //   <CardBody
+            //     type="actions"
+            //     nodeId={selectedNode}
+            //     listItems={ACTIONS}
+            //     selectedId={selectedAction}
+            //     onFocusId={clickedAction?.id}
+            //     handleSelect={handleActionChange}
+            //   />
+            //   {clickedAction && (
+            //     <>
+            //       <CardHeader>
+            //         <Typography variant="h3">Action Details</Typography>
+            //       </CardHeader>
+            //       <div className="card-body">
+            //         <TextField
+            //           fullWidth
+            //           margin="dense"
+            //           onChange={e =>
+            //             setClickedAction(prev => ({
+            //               ...prev,
+            //               value: e.target.value
+            //             }))
+            //           }
+            //           type={clickedAction.type}
+            //           value={clickedAction.value || ""}
+            //           label={clickedAction.label}
+            //         />
+            //         <Button
+            //           variant="text"
+            //           disableRipple
+            //           onClick={handleAddAction}
+            //         >
+            //           Add
+            //         </Button>
+            //       </div>
+            //     </>
+            //   )}
+            // </>
           )}
         </div>
       )}
 
       <div className="home-section">
-        <CardHeader hasPreviewButton={true} handleSave={handleSave}>
+        <CardHeader handleSave={handleSave}>
           <Typography variant="h3">Map your automation</Typography>
         </CardHeader>
         <div className="flow-body">
@@ -456,7 +472,7 @@ function HomePage() {
             onElementsRemove={onElementsRemove}
             onConnect={onConnect}
             nodeTypes={nodeTypes}
-            deleteKeyCode={46} /* 'delete'-key */
+            // deleteKeyCode={46} /* 'delete'-key */
             onSelectionChange={handleOnSelectionChange}
           />
         </div>
