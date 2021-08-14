@@ -41,6 +41,7 @@ function HomePage() {
       position: { x: 250, y: 25 }
     }
   ];
+
   const [elements, setElements] = useState(initialElements);
   const onElementsRemove = elementsToRemove =>
     setElements(els => removeElements(elementsToRemove, els));
@@ -83,6 +84,7 @@ function HomePage() {
                 setShowDrawer("conditions");
                 setSelectedNode(id);
               },
+              handleSwapConditionArrows: id => handleSwapConditionArrows(id),
               btnAction: id => {
                 setShowDrawer("conditions");
                 setSelectedNode(id);
@@ -316,6 +318,21 @@ function HomePage() {
     };
     setElements(tempElems);
     setShowDrawer(null);
+  };
+
+  const handleSwapConditionArrows = nodeId => {
+    const tempElements = Object.assign([], elementsStateRef.current);
+    const yesNodeIndex = tempElements.findIndex(
+      el => el.source === nodeId && el.label === "yes"
+    );
+    const noNodeIndex = tempElements.findIndex(
+      el => el.source === nodeId && el.label === "no"
+    );
+    tempElements[yesNodeIndex].label =
+      tempElements[yesNodeIndex].label === "yes" ? "no" : "yes";
+    tempElements[noNodeIndex].label =
+      tempElements[noNodeIndex].label === "yes" ? "no" : "yes";
+    setElements(tempElements);
   };
 
   const recursionFormObj = (tempElems, nodeId) => {
