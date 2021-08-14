@@ -19,8 +19,7 @@ function HomePage() {
   const [flow, setFlow] = useState({});
   const [showDrawer, setShowDrawer] = useState("events");
   const [selectedNode, setSelectedNode] = useState("1");
-  const [selectedAction, setSelectedAction] = useState({});
-  const [clickedAction, setClickedAction] = useState(null);
+  const [selectedActionIndex, setSelectedActionIndex] = useState(null);
 
   const initialElements = [
     {
@@ -51,7 +50,7 @@ function HomePage() {
   const selectedNodeStateRef = useRef();
   selectedNodeStateRef.current = selectedNode;
   const selActionStateRef = useRef();
-  selActionStateRef.current = selectedAction;
+  selActionStateRef.current = selectedActionIndex;
 
   const generateNextStepNodeObj = (nodeId, position) => {
     return {
@@ -88,8 +87,6 @@ function HomePage() {
                 setShowDrawer("conditions");
                 setSelectedNode(id);
               }
-              // handleDeleteCondition: (nodeId, itemId) =>
-              //   handleDeleteCondition(nodeId, itemId)
             },
             position: position
           },
@@ -102,14 +99,22 @@ function HomePage() {
               btnLabel: "Add action",
               focusNodeAction: id => {
                 setShowDrawer("actions");
+                setSelectedActionIndex(null);
                 setSelectedNode(id);
               },
               btnAction: id => {
                 setShowDrawer("actions");
                 setSelectedNode(id);
               },
-              handleDeleteAction: itemIndex =>
-                handleDeleteAction(nodeId, itemIndex)
+              handleSelectAction: (id, itemIndex) => {
+                setShowDrawer("actions");
+                setSelectedNode(id);
+                handleSelectAction(itemIndex);
+              },
+              handleDeleteAction: (id, itemIndex) => {
+                setSelectedNode(id);
+                handleDeleteAction(itemIndex);
+              }
             },
             position: { x: position.x, y: position.y + 400 }
           },
@@ -170,14 +175,22 @@ function HomePage() {
               btnLabel: "Add action",
               focusNodeAction: id => {
                 setShowDrawer("actions");
+                setSelectedActionIndex(null);
                 setSelectedNode(id);
               },
               btnAction: id => {
                 setShowDrawer("actions");
                 setSelectedNode(id);
               },
-              handleDeleteAction: itemIndex =>
-                handleDeleteAction(nodeId, itemIndex)
+              handleSelectAction: (id, itemIndex) => {
+                setShowDrawer("actions");
+                setSelectedNode(id);
+                handleSelectAction(itemIndex);
+              },
+              handleDeleteAction: (id, itemIndex) => {
+                setSelectedNode(id);
+                handleDeleteAction(itemIndex);
+              }
             },
             position: position
           },
@@ -195,14 +208,12 @@ function HomePage() {
 
         setElements(tempElems);
       }
-      // handleDeleteCondition: (nodeId, itemId) =>
-      //   handleDeleteCondition(nodeId, itemId)
     };
   };
 
   const handleEventChange = event => {
     setFlow({ ...flow, eventKey: event.eventKey });
-    let tempElems = Object.assign([], elements);
+    let tempElems = Object.assign([], elementsStateRef.current);
     tempElems[0] = {
       id: "1",
       type: "btnSelectorNode",
@@ -243,12 +254,10 @@ function HomePage() {
   };
 
   const handleConditionChange = conditionObj => {
-    // setSelectedCondition(prev => ({
-    //   ...prev,
-    //   [selectedNode]: [...(selectedCondition[selectedNode] || []), id]
-    // }));
-    let tempElems = Object.assign([], elements);
-    let tempElemIndex = tempElems.findIndex(t => t.id === selectedNode);
+    let tempElems = Object.assign([], elementsStateRef.current);
+    let tempElemIndex = tempElems.findIndex(
+      t => t.id === selectedNodeStateRef.current
+    );
     tempElems[tempElemIndex] = {
       ...tempElems[tempElemIndex],
       data: {
@@ -259,98 +268,129 @@ function HomePage() {
     setElements(tempElems);
   };
 
-  const handleActionChange = actionObj => {
-    let tempElems = Object.assign([], elements);
-    let tempElemIndex = tempElems.findIndex(t => t.id === selectedNode);
-    tempElems[tempElemIndex] = {
-      ...tempElems[tempElemIndex],
-      data: {
-        ...tempElems[tempElemIndex]?.data,
-        item: [...(tempElems[tempElemIndex]?.data?.item || []), actionObj]
-      }
-    };
-    setElements(tempElems);
-  };
-
-  const handleAddAction = () => {
-    setSelectedAction(prev => ({
-      ...prev,
-      [selectedNode]: [
-        ...(selectedAction[selectedNode] || []),
-        clickedAction.id
-      ]
-    }));
-    let tempElems = Object.assign([], elements);
-    let tempElemIndex = tempElems.findIndex(t => t.id === selectedNode);
-    tempElems[tempElemIndex] = {
-      ...tempElems[tempElemIndex],
-      data: {
-        ...tempElems[tempElemIndex]?.data,
-        actions: [
-          ...(tempElems[tempElemIndex]?.data?.actions || []),
-          clickedAction
-        ]
-      }
-    };
-    setElements(tempElems);
-  };
-
-  // const handleDeleteCondition = (nodeId, itemId) => {
-  //   let tempElems = Object.assign([], elementsStateRef.current);
-  //   let tempElemIndex = tempElems.findIndex(t => t.id === nodeId);
-  //   tempElems[tempElemIndex] = {
-  //     ...tempElems[tempElemIndex],
-  //     data: {
-  //       ...tempElems[tempElemIndex]?.data,
-  //       conditions: (tempElems[tempElemIndex]?.data?.conditions || []).filter(
-  //         t => t.id !== itemId
-  //       )
-  //     }
-  //   };
-  //   setSelectedCondition({
-  //     ...selConditionStateRef.current,
-  //     [selectedNodeStateRef.current]: (
-  //       selConditionStateRef.current[selectedNodeStateRef.current] || []
-  //     ).filter(c => c !== itemId)
-  //   });
-  //   setElements(tempElems);
-  // };
-
-  const handleDeleteAction = (nodeId, itemIndex) => {
+  // type = add / update
+  const handleActionChange = (actionObj, type) => {
     let tempElems = Object.assign([], elementsStateRef.current);
-    (tempElems.find(el => el.id === nodeId).data?.item || []).splice(
-      itemIndex,
-      1
+    let tempElemIndex = tempElems.findIndex(
+      t => t.id === selectedNodeStateRef.current
     );
-    // setSelectedAction({
-    //   ...selActionStateRef.current,
-    //   [selectedNodeStateRef.current]: (
-    //     selActionStateRef.current[selectedNodeStateRef.current] || []
-    //   ).filter(a => a !== itemId)
-    // });
+    tempElems[tempElemIndex] = {
+      ...tempElems[tempElemIndex],
+      data: {
+        ...tempElems[tempElemIndex]?.data,
+        item:
+          type === "update"
+            ? [
+                ...tempElems[tempElemIndex]?.data?.item.slice(
+                  0,
+                  selectedActionIndex
+                ),
+                actionObj,
+                ...tempElems[tempElemIndex]?.data?.item.slice(
+                  selectedActionIndex + 1
+                )
+              ]
+            : [...(tempElems[tempElemIndex]?.data?.item || []), actionObj]
+      }
+    };
     setElements(tempElems);
+  };
+
+  const handleSelectAction = itemIndex => {
+    setSelectedActionIndex(itemIndex);
+  };
+
+  const handleDeleteAction = itemIndex => {
+    let tempElems = Object.assign([], elementsStateRef.current);
+    let tempElemIndex = tempElems.findIndex(
+      t => t.id === selectedNodeStateRef.current
+    );
+    tempElems[tempElemIndex] = {
+      ...tempElems[tempElemIndex],
+      data: {
+        ...tempElems[tempElemIndex]?.data,
+        item: (tempElems[tempElemIndex]?.data?.item || []).filter(
+          (x, i) => i !== itemIndex
+        )
+      }
+    };
+    setElements(tempElems);
+    setShowDrawer(null);
+  };
+
+  const recursionFormObj = (tempElems, nodeId) => {
+    let obj = {
+      "Fn::If": [[tempElems.find(el => el.id === nodeId).data?.item]]
+    };
+
+    tempElems = tempElems.filter(
+      el => el.target !== nodeId && el.id !== nodeId
+    );
+
+    // condition-yes-action
+    const yesNodeId = tempElems.find(
+      el => el.source === nodeId && el.label === "yes"
+    ).target;
+    if (tempElems.find(el => el.id === yesNodeId).data?.type === "condition") {
+      // recursion and return object to be pushed in to second array
+      obj["Fn::If"].push([recursionFormObj(tempElems, nodeId)]);
+    } else {
+      obj["Fn::If"].push(tempElems.find(el => el.id === yesNodeId).data?.item);
+    }
+    tempElems = tempElems.filter(
+      el => el.target !== yesNodeId && el.id !== yesNodeId
+    );
+
+    // condition-no-action
+    const noNodeId = tempElems.find(
+      el => el.source === nodeId && el.label === "no"
+    ).target;
+    if (tempElems.find(el => el.id === noNodeId).data?.type === "condition") {
+      // recursion and return object to be pushed in to third array
+      obj["Fn::If"].push([recursionFormObj(tempElems, noNodeId)]);
+    } else {
+      obj["Fn::If"].push(tempElems.find(el => el.id === noNodeId).data?.item);
+    }
+    tempElems = tempElems.filter(
+      el => el.target !== noNodeId && el.id !== noNodeId
+    );
+
+    return obj;
   };
 
   const handleSave = () => {
-    const nodes = elements.filter(el => el.type === "btnSelectorNode");
-    const outputArr = [];
-    nodes.forEach(node => {
-      switch (node.data.type) {
-        case "event":
-          outputArr.push({ event: node.data.event });
-          break;
-        case "condition":
-          outputArr.push({ condition: node.data.conditions });
-          break;
-        case "action-yes":
-        case "action":
-          outputArr.push({ [node.data.type]: [...(node.data.actions || [])] });
-          break;
-        default:
-          break;
+    let tempElems = Object.assign([], elements);
+    const output = {
+      eventKey: "",
+      conditions: []
+    };
+
+    let i = 0;
+    while (tempElems.length > 0) {
+      let nodeId = tempElems[i].id;
+      if (tempElems[i].data?.type === "event") {
+        output.eventKey = tempElems[i].data?.item?.eventKey;
+        tempElems.splice(i, 1);
+      } else if (tempElems[i].data?.type === "condition") {
+        output.conditions.push(recursionFormObj(tempElems, nodeId));
+        break;
+      } else if (
+        tempElems.filter(el => el.type === "btnSelectorNode").length === 1 &&
+        tempElems[i].data?.type === "action"
+      ) {
+        output.conditions.push({
+          "Fn::If": [[{ noCondition: true }], tempElems[i].data?.item, []]
+        });
+        // Delete node and edge
+        tempElems = tempElems.filter(
+          el => el.id !== nodeId && el.target !== nodeId
+        );
+      } else {
+        i++;
       }
-    });
-    console.log("output", outputArr);
+    }
+
+    console.log("output", output);
   };
 
   // Handle lose focus on node to hide drawer
@@ -369,94 +409,34 @@ function HomePage() {
               selectedEventKey={flow.eventKey}
               handleSelect={handleEventChange}
             />
-            // <Actions />
-            // <>
-            //   <CardHeader>
-            //     <Typography variant="h3">Events</Typography>
-            //   </CardHeader>
-            //   <CardBody
-            //     type="events"
-            //     nodeId={selectedNode}
-            //     listItems={EVENTS}
-            //     selectedId={selectedEvent}
-            //     handleSelect={handleEventChange}
-            //   />
-            // </>
           )}
 
           {showDrawer === "conditions" && (
             <Conditions
               selectedEventKey={flow.eventKey}
               selectedConditionObj={
-                elements.find(el => el.id === selectedNodeStateRef.current)
-                  ?.data?.item || {}
+                elementsStateRef.current.find(
+                  el => el.id === selectedNodeStateRef.current
+                )?.data?.item || {}
               }
               handleSelect={handleConditionChange}
             />
-            // <>
-            //   <CardHeader>
-            //     <Typography variant="h3">Conditions</Typography>
-            //   </CardHeader>
-            //   <CardBody
-            //     type="conditions"
-            //     nodeId={selectedNode}
-            //     listItems={CONDITIONS}
-            //     selectedId={selectedCondition}
-            //     handleSelect={handleConditionChange}
-            //   />
-            // </>
           )}
 
           {showDrawer === "actions" && (
             <Actions
+              actionsArr={
+                elementsStateRef.current.find(
+                  el => el.id === selectedNodeStateRef.current
+                )?.data?.item || []
+              }
               selectedActionObj={
-                elements.find(el => el.id === selectedNodeStateRef.current)
-                  ?.data?.item || {}
+                (elementsStateRef.current.find(
+                  el => el.id === selectedNodeStateRef.current
+                )?.data?.item || [])[selectedActionIndex] || {}
               }
               handleSelect={handleActionChange}
             />
-            // <>
-            //   <CardHeader>
-            //     <Typography variant="h3">Actions</Typography>
-            //   </CardHeader>
-            //   <CardBody
-            //     type="actions"
-            //     nodeId={selectedNode}
-            //     listItems={ACTIONS}
-            //     selectedId={selectedAction}
-            //     onFocusId={clickedAction?.id}
-            //     handleSelect={handleActionChange}
-            //   />
-            //   {clickedAction && (
-            //     <>
-            //       <CardHeader>
-            //         <Typography variant="h3">Action Details</Typography>
-            //       </CardHeader>
-            //       <div className="card-body">
-            //         <TextField
-            //           fullWidth
-            //           margin="dense"
-            //           onChange={e =>
-            //             setClickedAction(prev => ({
-            //               ...prev,
-            //               value: e.target.value
-            //             }))
-            //           }
-            //           type={clickedAction.type}
-            //           value={clickedAction.value || ""}
-            //           label={clickedAction.label}
-            //         />
-            //         <Button
-            //           variant="text"
-            //           disableRipple
-            //           onClick={handleAddAction}
-            //         >
-            //           Add
-            //         </Button>
-            //       </div>
-            //     </>
-            //   )}
-            // </>
           )}
         </div>
       )}

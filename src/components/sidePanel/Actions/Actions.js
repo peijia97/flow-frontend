@@ -16,29 +16,27 @@ import { SAMPLE_ACTIONS } from "constants/constants";
 import "./Actions.scss";
 
 const Actions = props => {
-  const { handleSelect, handleAddAction, selectedActionObj, ...rest } = props;
+  const {
+    handleSelect,
+    handleAddAction,
+    actionsArr,
+    selectedActionObj,
+    ...rest
+  } = props;
 
   useEffect(() => {
-    setClickedAction(formatActionInputs(selectedActionObj));
+    if (Object.keys(selectedActionObj).length) {
+      setClickedAction(formatActionInputs(selectedActionObj));
+    } else {
+      setClickedAction({});
+    }
   }, [selectedActionObj]);
 
-  // {
-  //   actionKey: "CallContact",
-  //   actionInputs: [
-  //     {
-  //       key: "callContact",
-  //       value: "0123456789"
-  //     },
-  //     {
-  //       key: "callContactCountry",
-  //       value: "Singapore"
-  //     }
-  //   ]
-  // }
-
   const formatActionInputs = onFocusObj => {
-    const tempAction =
-      SAMPLE_ACTIONS.find(f => f.actionKey === onFocusObj.actionKey) || {};
+    const tempAction = Object.assign(
+      {},
+      SAMPLE_ACTIONS.find(f => f.actionKey === onFocusObj.actionKey)
+    );
     tempAction.fields?.forEach(f => {
       f.value = onFocusObj.actionInputs.find(
         input => input.key === f.key
@@ -54,7 +52,7 @@ const Actions = props => {
     setClickedAction(action);
   };
 
-  const handleOnAdd = () => {
+  const handleOnAddOrUpdate = () => {
     const result = {
       actionKey: clickedAction.actionKey,
       actionInputs: clickedAction.fields.map(f => ({
@@ -62,7 +60,10 @@ const Actions = props => {
         value: f.value
       }))
     };
-    handleSelect(result);
+    handleSelect(
+      result,
+      Object.keys(selectedActionObj).length ? "update" : "add"
+    );
   };
 
   const handleFieldInputChange = (e, field) => {
@@ -159,8 +160,8 @@ const Actions = props => {
                 />
               )
             )}
-            <Button variant="text" disableRipple onClick={handleOnAdd}>
-              Add
+            <Button variant="text" disableRipple onClick={handleOnAddOrUpdate}>
+              {Object.keys(selectedActionObj).length ? "Update" : "Add"}
             </Button>
           </div>
         </>
@@ -172,6 +173,7 @@ const Actions = props => {
 Actions.propTypes = {
   handleSelect: PropTypes.func,
   handleAddAction: PropTypes.func,
+  actionsArr: PropTypes.array,
   selectedActionObj: PropTypes.object
 };
 export { Actions };

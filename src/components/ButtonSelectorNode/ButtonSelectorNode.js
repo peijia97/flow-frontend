@@ -58,28 +58,6 @@ export default memo(({ id, data, isConnectable }) => {
                 } ${data.item.value.join(", ")}`}
           </Button>
         ) : (
-          // data.conditions.map((c, i) => (
-          //     <React.Fragment key={c.id}>
-          //       <div className="label-div">
-          //         <Button
-          //           variant="contained"
-          //           disabled
-          //           className="lbl-condition"
-          //         >
-          //           {c.name}
-          //         </Button>
-          //         <IconButton
-          //           disableRipple
-          //           onClick={() => data.handleDeleteCondition(id, c.id)}
-          //         >
-          //           <HighlightOffIcon />
-          //         </IconButton>
-          //         {i !== data.conditions.length - 1 && (
-          //           <Typography variant="h6">AND</Typography>
-          //         )}
-          //       </div>
-          //     </React.Fragment>
-          //   ))
           data.btnLabel && (
             <Button
               onClick={e => {
@@ -95,11 +73,18 @@ export default memo(({ id, data, isConnectable }) => {
 
       {/* type === 'action' || type === 'action-yes' */}
       {data.type.includes("action") &&
-        (data.item
+        (data.item?.length
           ? data.item.map((a, i) => (
               <React.Fragment key={i}>
                 <div className="label-div">
-                  <Button variant="contained" disabled className="lbl-action">
+                  <Button
+                    variant="contained"
+                    onClick={e => {
+                      data.handleSelectAction(id, i);
+                      e.stopPropagation();
+                    }}
+                    className="lbl-action"
+                  >
                     {`Action: ${a.actionKey}
                     ${a.actionInputs
                       .map(ai => `${ai.key} - ${ai.value}`)
@@ -107,7 +92,10 @@ export default memo(({ id, data, isConnectable }) => {
                   </Button>
                   <IconButton
                     disableRipple
-                    onClick={() => data.handleDeleteAction(i)}
+                    onClick={e => {
+                      data.handleDeleteAction(id, i);
+                      e.stopPropagation();
+                    }}
                   >
                     <HighlightOffIcon />
                   </IconButton>
