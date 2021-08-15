@@ -8,6 +8,7 @@ import { Actions } from "components/sidePanel/Actions/Actions";
 import { Background } from "components/common/Background/Background";
 import { CardHeader } from "components/common/CardHeader/CardHeader";
 import ButtonSelectorNode from "components/ButtonSelectorNode/ButtonSelectorNode";
+import { SAMPLE_EVENT_TRIGGERS, SAMPLE_FLOW } from "constants/constants";
 
 import "./HomePage.scss";
 
@@ -16,48 +17,98 @@ const nodeTypes = {
 };
 
 function HomePage() {
-  const [flow, setFlow] = useState({});
-  const [showDrawer, setShowDrawer] = useState("events");
-  const [selectedNode, setSelectedNode] = useState("1");
-  const [selectedActionIndex, setSelectedActionIndex] = useState(null);
-
-  const initialElements = [
-    {
-      id: "1",
-      type: "btnSelectorNode",
-      data: {
-        label: "When",
-        type: "event",
-        btnLabel: "Select event trigger",
-        focusNodeAction: id => {
-          setShowDrawer("events");
-          setSelectedNode(id);
-        },
-        btnAction: id => {
-          setShowDrawer("events");
-          setSelectedNode(id);
-        }
+  const initEventNodeElement = (
+    item,
+    nodeId = 1,
+    position = { x: 250, y: 25 }
+  ) => ({
+    id: nodeId.toString(),
+    position,
+    type: "btnSelectorNode",
+    data: {
+      item,
+      type: "event",
+      label: "When",
+      btnLabel: "Select Event Trigger",
+      focusNodeAction: id => {
+        setShowDrawer("events");
+        setSelectedNode(id);
       },
-      position: { x: 250, y: 25 }
+      btnAction: id => {
+        setShowDrawer("events");
+        setSelectedNode(id);
+      }
     }
-  ];
+  });
 
-  const [elements, setElements] = useState(initialElements);
-  const onElementsRemove = elementsToRemove =>
-    setElements(els => removeElements(elementsToRemove, els));
-  const onConnect = params => setElements(els => addEdge(params, els));
-  const elementsStateRef = useRef();
-  elementsStateRef.current = elements;
-  const selectedNodeStateRef = useRef();
-  selectedNodeStateRef.current = selectedNode;
-  const selActionStateRef = useRef();
-  selActionStateRef.current = selectedActionIndex;
-
-  const generateNextStepNodeObj = (nodeId, position) => {
-    return {
-      label: `Next Step`,
-      type: "choice",
+  const initConditionNodeElement = (
+    item,
+    nodeId = 1,
+    position = { x: 250, y: 25 }
+  ) => ({
+    id: nodeId.toString(),
+    position,
+    type: "btnSelectorNode",
+    data: {
+      item,
+      type: "condition",
+      label: "If...",
       btnLabel: "Add condition",
+      focusNodeAction: id => {
+        setShowDrawer("conditions");
+        setSelectedNode(id);
+      },
+      handleSwapConditionArrows: id => handleSwapConditionArrows(id),
+      btnAction: id => {
+        setShowDrawer("conditions");
+        setSelectedNode(id);
+      }
+    }
+  });
+
+  const initActionNodeElement = (
+    item,
+    nodeId = 1,
+    position = { x: 250, y: 25 }
+  ) => ({
+    id: nodeId.toString(),
+    position,
+    type: "btnSelectorNode",
+    data: {
+      item,
+      type: "action",
+      label: "Then...",
+      btnLabel: "Add action",
+      focusNodeAction: id => {
+        setShowDrawer("actions");
+        setSelectedActionIndex(null);
+        setSelectedNode(id);
+      },
+      btnAction: id => {
+        setShowDrawer("actions");
+        setSelectedNode(id);
+      },
+      handleSelectAction: (id, itemIndex) => {
+        setShowDrawer("actions");
+        setSelectedNode(id);
+        handleSelectAction(itemIndex);
+      },
+      handleDeleteAction: (id, itemIndex) => {
+        setSelectedNode(id);
+        handleDeleteAction(itemIndex);
+      }
+    }
+  });
+
+  const initChoiceNodeElement = (nodeId = 1, position = { x: 250, y: 25 }) => ({
+    id: nodeId.toString(),
+    position,
+    type: "btnSelectorNode",
+    data: {
+      type: "choice",
+      label: "Next Step",
+      btnLabel: "Add condition",
+      btnLabel2: "Add action",
       focusNodeAction: id => {
         setShowDrawer(null);
         setSelectedNode(id);
@@ -73,90 +124,37 @@ function HomePage() {
             t.id !== `edges-${(Number(nodeId) - 1).toString()}-${nodeId}`
         );
         tempElems.push(
-          {
-            id: nodeId, // 2
-            type: "btnSelectorNode",
-            data: {
-              label: `If...`,
-              type: "condition",
-              btnLabel: "Add condition",
-              focusNodeAction: id => {
-                setShowDrawer("conditions");
-                setSelectedNode(id);
-              },
-              handleSwapConditionArrows: id => handleSwapConditionArrows(id),
-              btnAction: id => {
-                setShowDrawer("conditions");
-                setSelectedNode(id);
-              }
-            },
-            position: position
-          },
-          {
-            id: (Number(nodeId) + 1).toString(), // 3
-            type: "btnSelectorNode",
-            data: {
-              label: `Then...`,
-              type: "action-yes",
-              btnLabel: "Add action",
-              focusNodeAction: id => {
-                setShowDrawer("actions");
-                setSelectedActionIndex(null);
-                setSelectedNode(id);
-              },
-              btnAction: id => {
-                setShowDrawer("actions");
-                setSelectedNode(id);
-              },
-              handleSelectAction: (id, itemIndex) => {
-                setShowDrawer("actions");
-                setSelectedNode(id);
-                handleSelectAction(itemIndex);
-              },
-              handleDeleteAction: (id, itemIndex) => {
-                setSelectedNode(id);
-                handleDeleteAction(itemIndex);
-              }
-            },
-            position: { x: position.x, y: position.y + 400 }
-          },
-          {
-            id: (Number(nodeId) + 2).toString(), // 4
-            type: "btnSelectorNode",
-            data: generateNextStepNodeObj((Number(nodeId) + 2).toString(), {
-              x: position.x + 300,
-              y: position.y + 150
-            }),
-            position: { x: position.x + 300, y: position.y + 150 }
-          },
+          initConditionNodeElement(null, nodeId, position), // 2
+          initActionNodeElement(null, Number(nodeId) + 1, {
+            // 3 = yes
+            x: position.x,
+            y: position.y + 400
+          }),
+          initChoiceNodeElement((Number(nodeId) + 2).toString(), {
+            x: position.x + 300,
+            y: position.y + 150
+          }),
           ...(nodeId === "2"
             ? [
-                {
-                  id: `edges-${(Number(nodeId) - 1).toString()}-${nodeId}`, // edges-1-2
+                initNodeEdge({
                   source: (Number(nodeId) - 1).toString(),
-                  target: nodeId,
-                  type: "smoothstep"
-                }
+                  target: nodeId
+                })
               ]
             : []),
-          {
-            id: `edges-${nodeId}-${(Number(nodeId) + 1).toString()}`, // edges-2-3
+          initNodeEdge({
             source: nodeId,
-            target: (Number(nodeId) + 1).toString(),
-            type: "smoothstep",
+            target: (Number(nodeId) + 1).toString(), // edges-2-3
             label: "yes"
-          },
-          {
-            id: `edges-${nodeId}-${(Number(nodeId) + 2).toString()}`, // edges-2-4
+          }),
+          initNodeEdge({
             source: nodeId,
-            target: (Number(nodeId) + 2).toString(),
-            type: "smoothstep",
+            target: (Number(nodeId) + 2).toString(), // edges-2-4
             label: "no"
-          }
+          })
         );
         setElements(tempElems);
       },
-      btnLabel2: "Add Action",
       btnAction2: id => {
         setShowDrawer("actions");
         setSelectedNode(id);
@@ -168,87 +166,56 @@ function HomePage() {
             t.id !== `edges-${(Number(nodeId) - 1).toString()}-${nodeId}` // edges-1-2
         );
         tempElems.push(
-          {
-            id: nodeId,
-            type: "btnSelectorNode",
-            data: {
-              label: `Then...`,
-              type: "action",
-              btnLabel: "Add action",
-              focusNodeAction: id => {
-                setShowDrawer("actions");
-                setSelectedActionIndex(null);
-                setSelectedNode(id);
-              },
-              btnAction: id => {
-                setShowDrawer("actions");
-                setSelectedNode(id);
-              },
-              handleSelectAction: (id, itemIndex) => {
-                setShowDrawer("actions");
-                setSelectedNode(id);
-                handleSelectAction(itemIndex);
-              },
-              handleDeleteAction: (id, itemIndex) => {
-                setSelectedNode(id);
-                handleDeleteAction(itemIndex);
-              }
-            },
-            position: position
-          },
+          initActionNodeElement(null, nodeId, position),
           ...(nodeId === "2"
             ? [
-                {
-                  id: `edges-${(Number(nodeId) - 1).toString()}-${nodeId}`, // edges-1-2
+                initNodeEdge({
                   source: (Number(nodeId) - 1).toString(),
-                  target: nodeId,
-                  type: "smoothstep"
-                }
+                  target: nodeId
+                })
               ]
             : [])
         );
 
         setElements(tempElems);
       }
-    };
-  };
+    }
+  });
+
+  const initNodeEdge = ({ source, target, label }) => ({
+    id: `edges-${source}-${target}`, // edges-1-2
+    source: source.toString(),
+    target: target.toString(),
+    type: "smoothstep",
+    label
+  });
+
+  const [flow, setFlow] = useState({});
+  const [showDrawer, setShowDrawer] = useState("events");
+  const [selectedNode, setSelectedNode] = useState("1");
+  const [selectedActionIndex, setSelectedActionIndex] = useState(null);
+  const [elements, setElements] = useState([initEventNodeElement()]);
+  const onElementsRemove = elementsToRemove =>
+    setElements(els => removeElements(elementsToRemove, els));
+  const onConnect = params => setElements(els => addEdge(params, els));
+
+  const elementsStateRef = useRef();
+  elementsStateRef.current = elements;
+  const selectedNodeStateRef = useRef();
+  selectedNodeStateRef.current = selectedNode;
 
   const handleEventChange = event => {
     setFlow({ ...flow, eventKey: event.eventKey });
     let tempElems = Object.assign([], elementsStateRef.current);
-    tempElems[0] = {
-      id: "1",
-      type: "btnSelectorNode",
-      data: {
-        label: "When",
-        type: "event",
-        item: event,
-        focusNodeAction: id => {
-          setShowDrawer("events");
-          setSelectedNode(id);
-        },
-        btnAction: id => {
-          setShowDrawer("events");
-          setSelectedNode(id);
-        }
-      },
-      position: { x: 250, y: 25 }
-    };
+    tempElems[0] = initEventNodeElement(event);
 
     if (tempElems.length === 1) {
       tempElems.push(
-        {
-          id: "2",
-          type: "btnSelectorNode",
-          data: generateNextStepNodeObj("2", { x: 250, y: 200 }),
-          position: { x: 250, y: 200 }
-        },
-        {
-          id: "edges-1-2",
+        initChoiceNodeElement("2", { x: 250, y: 200 }),
+        initNodeEdge({
           source: "1",
-          target: "2",
-          type: "smoothstep"
-        }
+          target: "2"
+        })
       );
     }
     setShowDrawer(null);
@@ -337,7 +304,11 @@ function HomePage() {
 
   const recursionFormObj = (tempElems, nodeId) => {
     let obj = {
-      "Fn::If": [[tempElems.find(el => el.id === nodeId).data?.item]]
+      "Fn::If": [
+        tempElems.find(el => el.id === nodeId).data?.item
+          ? [tempElems.find(el => el.id === nodeId).data?.item]
+          : []
+      ]
     };
 
     tempElems = tempElems.filter(
@@ -352,7 +323,9 @@ function HomePage() {
       // recursion and return object to be pushed in to second array
       obj["Fn::If"].push([recursionFormObj(tempElems, nodeId)]);
     } else {
-      obj["Fn::If"].push(tempElems.find(el => el.id === yesNodeId).data?.item);
+      obj["Fn::If"].push(
+        tempElems.find(el => el.id === yesNodeId).data?.item || []
+      );
     }
     tempElems = tempElems.filter(
       el => el.target !== yesNodeId && el.id !== yesNodeId
@@ -366,7 +339,9 @@ function HomePage() {
       // recursion and return object to be pushed in to third array
       obj["Fn::If"].push([recursionFormObj(tempElems, noNodeId)]);
     } else {
-      obj["Fn::If"].push(tempElems.find(el => el.id === noNodeId).data?.item);
+      obj["Fn::If"].push(
+        tempElems.find(el => el.id === noNodeId).data?.item || []
+      );
     }
     tempElems = tempElems.filter(
       el => el.target !== noNodeId && el.id !== noNodeId
@@ -396,7 +371,7 @@ function HomePage() {
         tempElems[i].data?.type === "action"
       ) {
         output.conditions.push({
-          "Fn::If": [[{ noCondition: true }], tempElems[i].data?.item, []]
+          "Fn::If": [[{ noCondition: true }], tempElems[i].data?.item || [], []]
         });
         // Delete node and edge
         tempElems = tempElems.filter(
@@ -408,6 +383,31 @@ function HomePage() {
     }
 
     console.log("output", output);
+  };
+
+  const generateInitialElements = () => {
+    let nodeId = 1;
+    let type = "btnSelectorNode";
+    let position = { x: 250, y: 25 };
+    let initialElements = [];
+    const sampleFlow = Object.assign({}, SAMPLE_FLOW);
+
+    // Event
+    initialElements.push(
+      initEventNodeElement(
+        SAMPLE_EVENT_TRIGGERS.find(t => t.eventKey === sampleFlow.eventKey)
+      )
+    );
+    // Condition
+
+    // Action
+
+    console.log("i", initialElements);
+    console.log("e", elements);
+  };
+
+  const handlePreview = () => {
+    generateInitialElements();
   };
 
   // Handle lose focus on node to hide drawer
@@ -459,7 +459,11 @@ function HomePage() {
       )}
 
       <div className="home-section">
-        <CardHeader handleSave={handleSave}>
+        <CardHeader
+          hasPreviewButton
+          handlePreview={handlePreview}
+          handleSave={handleSave}
+        >
           <Typography variant="h3">Map your automation</Typography>
         </CardHeader>
         <div className="flow-body">

@@ -23,6 +23,7 @@ export default memo(({ id, data, isConnectable }) => {
         <Typography variant="body1">{data.label}</Typography>
       </div>
 
+      {/* Event type */}
       {data.type === "event" &&
         (data.item ? (
           <Button variant="contained" disabled className="lbl-event">
@@ -42,6 +43,7 @@ export default memo(({ id, data, isConnectable }) => {
           )
         ))}
 
+      {/* Condition or Choice type */}
       {(data.type === "condition" || data.type === "choice") && (
         <>
           {data.type === "condition" && (
@@ -87,8 +89,8 @@ export default memo(({ id, data, isConnectable }) => {
         </>
       )}
 
-      {/* type === 'action' || type === 'action-yes' */}
-      {data.type.includes("action") &&
+      {/* Action Type */}
+      {data.type === "action" &&
         (data.item?.length
           ? data.item.map((a, i) => (
               <React.Fragment key={i}>
