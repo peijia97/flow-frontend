@@ -24,7 +24,7 @@ const CardHeader = props => {
             className="btn-preview"
             onClick={handlePreview}
           >
-            Go to Preview
+            View Preset Flow
           </Button>
         )}
         {handleSave && (

@@ -205,7 +205,7 @@ function HomePage() {
   selectedNodeStateRef.current = selectedNode;
 
   const handleEventChange = event => {
-    setFlow({ ...flow, eventKey: event.eventKey });
+    // setFlow({ ...flow, eventKey: event.eventKey });
     let tempElems = Object.assign([], elementsStateRef.current);
     tempElems[0] = initEventNodeElement(event);
 
@@ -385,29 +385,99 @@ function HomePage() {
     console.log("output", output);
   };
 
-  const generateInitialElements = () => {
+  const recursionFromElement = (conditionObj, nodeId, position) => {
+    return [
+      initConditionNodeElement(
+        Object.values(conditionObj[0])[0],
+        nodeId,
+        position
+      ), // 2
+      initActionNodeElement(conditionObj[2], nodeId + 1, {
+        // 3
+        x: position.x,
+        y: position.y + 400
+      }),
+      ...(Object.keys(conditionObj[1][0])[0].includes("Fn::")
+        ? recursionFromElement(
+            Object.values(conditionObj[1][0])[0],
+            nodeId + 2, // 4
+            {
+              x: position.x + 300,
+              y: position.y + 150
+            }
+          )
+        : [
+            initActionNodeElement(conditionObj[1], nodeId + 2, {
+              // 3
+              x: position.x + 300,
+              y: position.y + 150
+            })
+          ]),
+      initNodeEdge({
+        source: nodeId,
+        target: Number(nodeId) + 1,
+        label: "yes"
+      }),
+      initNodeEdge({
+        source: nodeId,
+        target: Number(nodeId) + 2,
+        label: "no"
+      })
+    ];
+  };
+
+  const handlePreview = () => {
     let nodeId = 1;
-    let type = "btnSelectorNode";
-    let position = { x: 250, y: 25 };
+    let position = { x: 250, y: 200 };
     let initialElements = [];
-    const sampleFlow = Object.assign({}, SAMPLE_FLOW);
+    const sampleFlowConditions = Object.assign(
+      [],
+      SAMPLE_FLOW.conditions[0]["Fn::If"]
+    );
 
     // Event
     initialElements.push(
       initEventNodeElement(
-        SAMPLE_EVENT_TRIGGERS.find(t => t.eventKey === sampleFlow.eventKey)
+        SAMPLE_EVENT_TRIGGERS.find(t => t.eventKey === SAMPLE_FLOW.eventKey)
       )
     );
-    // Condition
 
-    // Action
-
-    console.log("i", initialElements);
-    console.log("e", elements);
-  };
-
-  const handlePreview = () => {
-    generateInitialElements();
+    // Condition + Action
+    let i = 0;
+    while (i < 3) {
+      nodeId += 1;
+      if (
+        Object.keys(sampleFlowConditions[i]).includes("Fn::") ||
+        Object.keys(sampleFlowConditions[i].includes("conditionKey"))
+      ) {
+        // Condition
+        initialElements = [
+          ...initialElements,
+          ...recursionFromElement(sampleFlowConditions, nodeId, position),
+          initNodeEdge({
+            source: "1",
+            target: "2"
+          })
+        ];
+        // i += 2 because both yes and no actions for the condition already pushed into array
+        // to complete / stop the loop
+        i += 2;
+      } else if (sampleFlowConditions[i + 1]) {
+        // Action
+        initialElements.push(
+          initActionNodeElement(sampleFlowConditions[i + 1], nodeId, {
+            x: 250,
+            y: 25
+          }),
+          initNodeEdge({
+            source: (Number(nodeId) - 1).toString(),
+            target: nodeId
+          })
+        );
+      }
+      i++;
+    }
+    setElements(initialElements);
   };
 
   // Handle lose focus on node to hide drawer
@@ -423,14 +493,14 @@ function HomePage() {
         <div className="drawer">
           {showDrawer === "events" && (
             <Events
-              selectedEventKey={flow.eventKey}
+              selectedEventKey={elements[0].data?.item?.eventKey}
               handleSelect={handleEventChange}
             />
           )}
 
           {showDrawer === "conditions" && (
             <Conditions
-              selectedEventKey={flow.eventKey}
+              selectedEventKey={elements[0].data?.item?.eventKey}
               selectedConditionObj={
                 elementsStateRef.current.find(
                   el => el.id === selectedNodeStateRef.current

@@ -145,7 +145,7 @@ export const SAMPLE_FLOW = {
                   actionKey: "SendEmail",
                   actionInputs: [
                     {
-                      key: "sendEmail",
+                      key: "emailAddress",
                       value: "simon@gmail.com"
                     }
                   ]
@@ -172,7 +172,7 @@ export const SAMPLE_FLOW = {
             actionKey: "SendEmail",
             actionInputs: [
               {
-                key: "sendEmail",
+                key: "emailAddress",
                 value: "hello@gmail.com"
               }
             ]
