@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ReactFlow, { removeElements, addEdge } from "react-flow-renderer";
 
 import Typography from "@material-ui/core/Typography";
@@ -9,6 +9,7 @@ import { Background } from "components/common/Background/Background";
 import { CardHeader } from "components/common/CardHeader/CardHeader";
 import ButtonSelectorNode from "components/ButtonSelectorNode/ButtonSelectorNode";
 import { SAMPLE_EVENT_TRIGGERS, SAMPLE_FLOW } from "constants/constants";
+import { setModalState } from "states/modalState";
 
 import "./HomePage.scss";
 
@@ -17,6 +18,16 @@ const nodeTypes = {
 };
 
 function HomePage() {
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setModalState({
+        title: "Warning",
+        subtitle: "Device must be larger than 768px x 1024px to support flow",
+        btnLabel: "OK"
+      });
+    }
+  }, []);
+
   const initEventNodeElement = (
     item,
     nodeId = 1,
@@ -80,12 +91,13 @@ function HomePage() {
       label: "Then...",
       btnLabel: "Add action",
       focusNodeAction: id => {
-        setShowDrawer("actions");
+        setShowDrawer(null);
         setSelectedActionIndex(null);
         setSelectedNode(id);
       },
       btnAction: id => {
         setShowDrawer("actions");
+        setSelectedActionIndex(null);
         setSelectedNode(id);
       },
       handleSelectAction: (id, itemIndex) => {

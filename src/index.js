@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { Route, Switch, BrowserRouter } from "react-router-dom";
+import { Modal } from "components/common/Modal/Modal";
 import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
 import { Background } from "components/common/Background/Background";
 import reportWebVitals from "reportWebVitals";
@@ -24,6 +25,7 @@ const App = () => {
     <BrowserRouter>
       <MuiThemeProvider theme={theme}>
         <Suspense fallback={loading}>
+          <Modal />
           <Switch>
             <Route
               path="/"

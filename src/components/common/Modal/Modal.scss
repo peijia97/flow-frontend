@@ -1,0 +1,47 @@
+@import "src/scss/_variables";
+
+.Modal {
+  .MuiDialog-paper {
+    width: 20rem;
+    text-align: center;
+    padding: 3.5rem 3rem;
+    border-radius: 0 !important;
+
+    @media only screen and (max-width: 960px) {
+      padding: 2.5rem 2rem !important;
+    }
+
+    @media only screen and (max-width: 374px) {
+      padding: 2rem 1rem !important;
+    }
+
+    .btn-close {
+      color: $grey800;
+      position: absolute;
+      top: -12px;
+      right: -12px;
+    }
+
+    img {
+      width: 8rem;
+      margin: auto;
+      margin-bottom: 1.5rem;
+    }
+
+    .MuiTypography-h5 {
+      color: $grey800;
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .MuiTypography-body1 {
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .MuiButton-contained {
+      margin-bottom: 1rem;
+    }
+  }
+}

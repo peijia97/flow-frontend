@@ -91,8 +91,9 @@ export default memo(({ id, data, isConnectable }) => {
 
       {/* Action Type */}
       {data.type === "action" &&
-        (data.item?.length
-          ? data.item.map((a, i) => (
+        (data.item?.length ? (
+          <>
+            {data.item.map((a, i) => (
               <React.Fragment key={i}>
                 <div className="label-div">
                   <Button
@@ -122,18 +123,31 @@ export default memo(({ id, data, isConnectable }) => {
                   )}
                 </div>
               </React.Fragment>
-            ))
-          : data.btnLabel && (
-              <Button
-                onClick={e => {
-                  data.btnAction(id);
-                  e.stopPropagation();
-                }}
-                variant="contained"
-              >
-                {data.btnLabel}
-              </Button>
             ))}
+
+            <Button
+              onClick={e => {
+                data.btnAction(id);
+                e.stopPropagation();
+              }}
+              variant="contained"
+            >
+              Add Action
+            </Button>
+          </>
+        ) : (
+          data.btnLabel && (
+            <Button
+              onClick={e => {
+                data.btnAction(id);
+                e.stopPropagation();
+              }}
+              variant="contained"
+            >
+              {data.btnLabel}
+            </Button>
+          )
+        ))}
 
       {data.type === "choice" && (
         <Typography variant="h6" className="text-or">
