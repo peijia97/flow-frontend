@@ -202,7 +202,6 @@ function HomePage() {
     label
   });
 
-  const [flow, setFlow] = useState({});
   const [showDrawer, setShowDrawer] = useState("events");
   const [selectedNode, setSelectedNode] = useState("1");
   const [selectedActionIndex, setSelectedActionIndex] = useState(null);
@@ -369,6 +368,19 @@ function HomePage() {
       conditions: []
     };
 
+    // Incomplete flow
+    if (
+      tempElems.filter(el => el.type === "btnSelectorNode" && !el.data.item)
+        .length
+    ) {
+      setModalState({
+        title: "Warning",
+        subtitle: "Please complete the flow first before saving",
+        btnLabel: "OK"
+      });
+      return;
+    }
+
     let i = 0;
     while (tempElems.length > 0) {
       let nodeId = tempElems[i].id;
@@ -389,6 +401,8 @@ function HomePage() {
         tempElems = tempElems.filter(
           el => el.id !== nodeId && el.target !== nodeId
         );
+      } else if (tempElems[i].data?.type === "choice") {
+        return;
       } else {
         i++;
       }

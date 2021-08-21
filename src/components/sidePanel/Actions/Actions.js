@@ -67,6 +67,9 @@ const Actions = props => {
   };
 
   const handleFieldInputChange = (e, field) => {
+    if (field.key === "callContact" && !/^[0-9]*$/.test(e.target.value)) {
+      return;
+    }
     const tempClickedAction = Object.assign({}, clickedAction);
     const fieldIndex = clickedAction.fields.findIndex(f => f.key === field.key);
     tempClickedAction.fields[fieldIndex].value = e.target.value;
@@ -160,7 +163,12 @@ const Actions = props => {
                 />
               )
             )}
-            <Button variant="text" disableRipple onClick={handleOnAddOrUpdate}>
+            <Button
+              variant="contained"
+              className="mt-1"
+              disableRipple
+              onClick={handleOnAddOrUpdate}
+            >
               {Object.keys(selectedActionObj).length ? "Update" : "Add"}
             </Button>
           </div>

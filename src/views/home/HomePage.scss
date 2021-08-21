@@ -21,6 +21,18 @@
     }
   }
 
+  @media only screen and (max-width: 767px) {
+    .home-section {
+      width: 100%;
+      padding: 0;
+      min-width: 0;
+    }
+
+    .CardHeader {
+      width: calc(100% - 3rem);
+    }
+  }
+
   .drawer {
     flex: 1;
     height: 100vh;
