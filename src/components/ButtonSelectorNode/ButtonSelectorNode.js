@@ -112,7 +112,7 @@ export default memo(({ id, data, isConnectable }) => {
                   <IconButton
                     disableRipple
                     onClick={e => {
-                      data.handleDeleteAction(id, i);
+                      data.handleDeleteAction(id, i, a.actionKey);
                       e.stopPropagation();
                     }}
                   >

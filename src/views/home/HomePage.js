@@ -23,7 +23,7 @@ function HomePage() {
       setModalState({
         title: "Warning",
         subtitle: "Device must be larger than 768px x 1024px to support flow",
-        btnLabel: "OK"
+        persistent: true
       });
     }
   }, []);
@@ -105,9 +105,12 @@ function HomePage() {
         setSelectedNode(id);
         handleSelectAction(itemIndex);
       },
-      handleDeleteAction: (id, itemIndex) => {
+      handleDeleteAction: (id, itemIndex, actionKey) => {
+        setUnavailableActionKeys(
+          unavailableActionKeysStateRef.current.filter(k => k !== actionKey)
+        );
         setSelectedNode(id);
-        handleDeleteAction(itemIndex);
+        handleDeleteAction(id, itemIndex);
       }
     }
   });
@@ -205,6 +208,7 @@ function HomePage() {
   const [showDrawer, setShowDrawer] = useState("events");
   const [selectedNode, setSelectedNode] = useState("1");
   const [selectedActionIndex, setSelectedActionIndex] = useState(null);
+  const [unavailableActionKeys, setUnavailableActionKeys] = useState([]);
   const [elements, setElements] = useState([initEventNodeElement()]);
   const onElementsRemove = elementsToRemove =>
     setElements(els => removeElements(elementsToRemove, els));
@@ -214,6 +218,8 @@ function HomePage() {
   elementsStateRef.current = elements;
   const selectedNodeStateRef = useRef();
   selectedNodeStateRef.current = selectedNode;
+  const unavailableActionKeysStateRef = useRef();
+  unavailableActionKeysStateRef.current = unavailableActionKeys;
 
   const handleEventChange = event => {
     // setFlow({ ...flow, eventKey: event.eventKey });
@@ -273,6 +279,7 @@ function HomePage() {
             : [...(tempElems[tempElemIndex]?.data?.item || []), actionObj]
       }
     };
+    setUnavailableActionKeys([...unavailableActionKeys, actionObj.actionKey]);
     setElements(tempElems);
   };
 
@@ -280,11 +287,9 @@ function HomePage() {
     setSelectedActionIndex(itemIndex);
   };
 
-  const handleDeleteAction = itemIndex => {
+  const handleDeleteAction = (nodeId, itemIndex) => {
     let tempElems = Object.assign([], elementsStateRef.current);
-    let tempElemIndex = tempElems.findIndex(
-      t => t.id === selectedNodeStateRef.current
-    );
+    let tempElemIndex = tempElems.findIndex(t => t.id === nodeId);
     tempElems[tempElemIndex] = {
       ...tempElems[tempElemIndex],
       data: {
@@ -548,6 +553,7 @@ function HomePage() {
                   el => el.id === selectedNodeStateRef.current
                 )?.data?.item || [])[selectedActionIndex] || {}
               }
+              unavailableActionKeys={unavailableActionKeys}
               handleSelect={handleActionChange}
             />
           )}

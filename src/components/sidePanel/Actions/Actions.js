@@ -21,28 +21,29 @@ const Actions = props => {
     handleAddAction,
     actionsArr,
     selectedActionObj,
+    unavailableActionKeys,
     ...rest
   } = props;
+
+  const [fieldKeyValue, setFieldKeyValue] = useState({});
 
   useEffect(() => {
     if (Object.keys(selectedActionObj).length) {
       setClickedAction(formatActionInputs(selectedActionObj));
     } else {
       setClickedAction({});
+      setFieldKeyValue({});
     }
   }, [selectedActionObj]);
 
   const formatActionInputs = onFocusObj => {
-    const tempAction = Object.assign(
-      {},
-      SAMPLE_ACTIONS.find(f => f.actionKey === onFocusObj.actionKey)
+    setFieldKeyValue(
+      onFocusObj.actionInputs.reduce((map, obj) => {
+        map[obj.key] = obj.value;
+        return map;
+      }, {})
     );
-    tempAction.fields?.forEach(f => {
-      f.value = onFocusObj.actionInputs.find(
-        input => input.key === f.key
-      )?.value;
-    });
-    return tempAction;
+    return SAMPLE_ACTIONS.find(f => f.actionKey === onFocusObj.actionKey);
   };
 
   const [clickedAction, setClickedAction] = useState({});
@@ -55,9 +56,9 @@ const Actions = props => {
   const handleOnAddOrUpdate = () => {
     const result = {
       actionKey: clickedAction.actionKey,
-      actionInputs: clickedAction.fields.map(f => ({
-        key: f.key,
-        value: f.value
+      actionInputs: Object.entries(fieldKeyValue).map(f => ({
+        key: f[0],
+        value: f[1]
       }))
     };
     handleSelect(
@@ -70,10 +71,9 @@ const Actions = props => {
     if (field.key === "callContact" && !/^[0-9]*$/.test(e.target.value)) {
       return;
     }
-    const tempClickedAction = Object.assign({}, clickedAction);
-    const fieldIndex = clickedAction.fields.findIndex(f => f.key === field.key);
-    tempClickedAction.fields[fieldIndex].value = e.target.value;
-    setClickedAction(tempClickedAction);
+    const tempFieldKeyValue = Object.assign({}, fieldKeyValue);
+    tempFieldKeyValue[field.key] = e.target.value;
+    setFieldKeyValue(tempFieldKeyValue);
   };
 
   return (
@@ -89,7 +89,9 @@ const Actions = props => {
           } ${showMore ? "show-all" : ""}`}
           {...rest}
         >
-          {SAMPLE_ACTIONS.map(item => (
+          {SAMPLE_ACTIONS.filter(
+            action => !unavailableActionKeys.includes(action.actionKey)
+          ).map(item => (
             <Button
               key={item.actionKey}
               onClick={() => handleOnClickAction(item)}
@@ -103,6 +105,14 @@ const Actions = props => {
               {item.actionDisplay}
             </Button>
           ))}
+
+          {!SAMPLE_ACTIONS.filter(
+            action => !unavailableActionKeys.includes(action.actionKey)
+          ).length && (
+            <Typography variant="body1" className="label-no-more">
+              No action available
+            </Typography>
+          )}
         </div>
 
         {SAMPLE_ACTIONS.length > 3 && (
@@ -140,7 +150,7 @@ const Actions = props => {
                   <Select
                     labelId={`label-${field.key}`}
                     id={field.key}
-                    value={field.value || ""}
+                    value={fieldKeyValue[field.key] || ""}
                     onChange={e => handleFieldInputChange(e, field)}
                   >
                     {field.option.map(opt => (
@@ -157,7 +167,7 @@ const Actions = props => {
                   margin="dense"
                   onChange={e => handleFieldInputChange(e, field)}
                   type={"text"}
-                  value={field.value || ""}
+                  value={fieldKeyValue[field.key] || ""}
                   label={field.placeHolder}
                   placeholder={field.placeHolder}
                 />
@@ -181,6 +191,7 @@ const Actions = props => {
 Actions.propTypes = {
   handleSelect: PropTypes.func,
   handleAddAction: PropTypes.func,
+  unavailableActionKeys: PropTypes.array,
   actionsArr: PropTypes.array,
   selectedActionObj: PropTypes.object
 };

@@ -17,7 +17,10 @@ const Modal = () => {
     }
   }, [modalStore]);
 
-  const handleClose = () => {
+  const handleClose = (e, reason) => {
+    if (reason === "backdropClick" || reason === "escapeKeyDown") {
+      return;
+    }
     setShowModal(false);
   };
 
@@ -38,21 +41,25 @@ const Modal = () => {
   return (
     <Dialog className="Modal" onClose={handleClose} open={showModal}>
       <Typography variant="h5">
-        <IconButton
-          aria-label="close"
-          className="btn-close"
-          onClick={handleClose}
-        >
-          <CloseIcon />
-        </IconButton>
+        {!modalStore.persistent && (
+          <IconButton
+            aria-label="close"
+            className="btn-close"
+            onClick={handleClose}
+          >
+            <CloseIcon />
+          </IconButton>
+        )}
         {modalStore.title}
       </Typography>
       {modalStore.subtitle && (
         <Typography variant="body1">{modalStore.subtitle}</Typography>
       )}
-      <Button variant="contained" onClick={handleDoAction}>
-        {modalStore.btnLabel}
-      </Button>
+      {modalStore.btnLabel && (
+        <Button variant="contained" onClick={handleDoAction}>
+          {modalStore.btnLabel}
+        </Button>
+      )}
       {modalStore.secondaryBtnLabel && (
         <Button variant="outlined" onClick={handleDoSecondaryAction}>
           {modalStore.secondaryBtnLabel}
