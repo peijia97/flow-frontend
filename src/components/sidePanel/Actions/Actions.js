@@ -11,6 +11,7 @@ import AddBoxOutlinedIcon from "@material-ui/icons/AddBoxOutlined";
 import KeyboardArrowUpOutlinedIcon from "@material-ui/icons/KeyboardArrowUpOutlined";
 import KeyboardArrowDownOutlinedIcon from "@material-ui/icons/KeyboardArrowDownOutlined";
 import TextField from "@material-ui/core/TextField";
+import { setModalState } from "states/modalState";
 import { SAMPLE_ACTIONS } from "constants/constants";
 
 import "./Actions.scss";
@@ -54,6 +55,17 @@ const Actions = props => {
   };
 
   const handleOnAddOrUpdate = () => {
+    if (
+      clickedAction.fields.length !== Object.keys(fieldKeyValue).length ||
+      Object.values(fieldKeyValue).filter(v => !v).length
+    ) {
+      setModalState({
+        title: "Warning",
+        subtitle: "Please complete the action fields before saving",
+        btnLabel: "OK"
+      });
+      return;
+    }
     const result = {
       actionKey: clickedAction.actionKey,
       actionInputs: Object.entries(fieldKeyValue).map(f => ({

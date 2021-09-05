@@ -10,6 +10,7 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import Select from "@material-ui/core/Select";
 import ClearIcon from "@material-ui/icons/Clear";
 import AddBoxOutlinedIcon from "@material-ui/icons/AddBoxOutlined";
+import { setModalState } from "states/modalState";
 import { CardHeader } from "components/common/CardHeader/CardHeader";
 import {
   SAMPLE_EVENT_TRIGGERS,
@@ -68,6 +69,19 @@ const Conditions = props => {
   };
 
   const handleOnSave = () => {
+    // Empty field validation
+    if (
+      conditions.find(
+        c => !c.conditionKey || !c.operator || c.value.filter(v => !v).length
+      )
+    ) {
+      setModalState({
+        title: "Warning",
+        subtitle: "Please complete the condition fields before saving",
+        btnLabel: "OK"
+      });
+      return;
+    }
     const result = mustMeet ? { [mustMeet]: conditions } : conditions[0];
     handleSelect(result);
   };

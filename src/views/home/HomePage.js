@@ -130,6 +130,7 @@ function HomePage() {
       },
       btnAction: id => {
         setShowDrawer("conditions");
+        setTotalConditionsCount(totalConditionsCountStateRef.current + 1);
         setSelectedNode(id);
 
         let tempElems = Object.assign([], elementsStateRef.current);
@@ -145,10 +146,15 @@ function HomePage() {
             x: position.x,
             y: position.y + 400
           }),
-          initChoiceNodeElement((Number(nodeId) + 2).toString(), {
-            x: position.x + 300,
-            y: position.y + 150
-          }),
+          totalConditionsCountStateRef.current + 1 === 3 // reached max 3 conditions limit
+            ? initActionNodeElement(null, Number(nodeId) + 2, {
+                x: position.x + 300,
+                y: position.y + 150
+              })
+            : initChoiceNodeElement((Number(nodeId) + 2).toString(), {
+                x: position.x + 300,
+                y: position.y + 150
+              }),
           ...(nodeId === "2"
             ? [
                 initNodeEdge({
@@ -209,6 +215,7 @@ function HomePage() {
   const [selectedNode, setSelectedNode] = useState("1");
   const [selectedActionIndex, setSelectedActionIndex] = useState(null);
   const [unavailableActionKeys, setUnavailableActionKeys] = useState([]);
+  const [totalConditionsCount, setTotalConditionsCount] = useState(0);
   const [elements, setElements] = useState([initEventNodeElement()]);
   const onElementsRemove = elementsToRemove =>
     setElements(els => removeElements(elementsToRemove, els));
@@ -220,6 +227,8 @@ function HomePage() {
   selectedNodeStateRef.current = selectedNode;
   const unavailableActionKeysStateRef = useRef();
   unavailableActionKeysStateRef.current = unavailableActionKeys;
+  const totalConditionsCountStateRef = useRef();
+  totalConditionsCountStateRef.current = totalConditionsCount;
 
   const handleEventChange = event => {
     // setFlow({ ...flow, eventKey: event.eventKey });
@@ -279,6 +288,7 @@ function HomePage() {
             : [...(tempElems[tempElemIndex]?.data?.item || []), actionObj]
       }
     };
+    console.log(selectedNode);
     setUnavailableActionKeys([...unavailableActionKeys, actionObj.actionKey]);
     setElements(tempElems);
   };
