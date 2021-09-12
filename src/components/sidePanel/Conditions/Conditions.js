@@ -82,6 +82,15 @@ const Conditions = props => {
       });
       return;
     }
+    let tempConditions = Object.assign([], conditions)
+    while (tempConditions.length > 0) {
+      const firstCondition = tempConditions[0];
+      const groupedConditions = tempConditions.filter(c => c.conditionKey === firstCondition.conditionKey);
+      // groupedConditions.filter(g=>g.value.includes())
+
+      tempConditions = tempConditions.filter(c=>groupedConditions.includes(c.conditionKey))
+    }
+    console.log(conditions)
     const result = mustMeet ? { [mustMeet]: conditions } : conditions[0];
     handleSelect(result);
   };

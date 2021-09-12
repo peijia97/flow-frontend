@@ -31,7 +31,7 @@ function HomePage() {
   const initEventNodeElement = (
     item,
     nodeId = 1,
-    position = { x: 250, y: 25 }
+    position = { x: 250, y: 50 }
   ) => ({
     id: nodeId.toString(),
     position,
@@ -39,7 +39,7 @@ function HomePage() {
     data: {
       item,
       type: "event",
-      label: "When",
+      label: "When...",
       btnLabel: "Select Event Trigger",
       focusNodeAction: id => {
         setShowDrawer("events");
@@ -55,7 +55,7 @@ function HomePage() {
   const initConditionNodeElement = (
     item,
     nodeId = 1,
-    position = { x: 250, y: 25 }
+    position = { x: 250, y: 50 }
   ) => ({
     id: nodeId.toString(),
     position,
@@ -70,6 +70,7 @@ function HomePage() {
         setSelectedNode(id);
       },
       handleSwapConditionArrows: id => handleSwapConditionArrows(id),
+      handleDeleteCondition: id => handleDeleteCondition(id),
       btnAction: id => {
         setShowDrawer("conditions");
         setSelectedNode(id);
@@ -80,7 +81,7 @@ function HomePage() {
   const initActionNodeElement = (
     item,
     nodeId = 1,
-    position = { x: 250, y: 25 }
+    position = { x: 250, y: 50 }
   ) => ({
     id: nodeId.toString(),
     position,
@@ -115,7 +116,7 @@ function HomePage() {
     }
   });
 
-  const initChoiceNodeElement = (nodeId = 1, position = { x: 250, y: 25 }) => ({
+  const initChoiceNodeElement = (nodeId = 1, position = { x: 250, y: 50 }) => ({
     id: nodeId.toString(),
     position,
     type: "btnSelectorNode",
@@ -143,8 +144,8 @@ function HomePage() {
           initConditionNodeElement(null, nodeId, position), // 2
           initActionNodeElement(null, Number(nodeId) + 1, {
             // 3 = yes
-            x: position.x,
-            y: position.y + 400
+            x: position.x - 250,
+            y: position.y + 150
           }),
           totalConditionsCountStateRef.current + 1 === 3 // reached max 3 conditions limit
             ? initActionNodeElement(null, Number(nodeId) + 2, {
@@ -166,12 +167,20 @@ function HomePage() {
           initNodeEdge({
             source: nodeId,
             target: (Number(nodeId) + 1).toString(), // edges-2-3
-            label: "yes"
+            label: "yes",
+            labelBgPadding: [8, 4],
+            labelBgBorderRadius: 13,
+            labelStyle: { fill: "#3b8dd6", fontWeight: 700 },
+            labelBgStyle: { fill: "#f1f7fb" }
           }),
           initNodeEdge({
             source: nodeId,
             target: (Number(nodeId) + 2).toString(), // edges-2-4
-            label: "no"
+            label: "no",
+            labelBgPadding: [8, 4],
+            labelBgBorderRadius: 13,
+            labelStyle: { fill: "#4a5568", fontWeight: 700 },
+            labelBgStyle: { fill: "#ececec" }
           })
         );
         setElements(tempElems);
@@ -203,12 +212,12 @@ function HomePage() {
     }
   });
 
-  const initNodeEdge = ({ source, target, label }) => ({
+  const initNodeEdge = ({ source, target, ...rest }) => ({
     id: `edges-${source}-${target}`, // edges-1-2
     source: source.toString(),
     target: target.toString(),
-    type: "smoothstep",
-    label
+    type: "default",
+    ...rest
   });
 
   const [showDrawer, setShowDrawer] = useState("events");
@@ -237,7 +246,7 @@ function HomePage() {
 
     if (tempElems.length === 1) {
       tempElems.push(
-        initChoiceNodeElement("2", { x: 250, y: 200 }),
+        initChoiceNodeElement("2", { x: 250, y: 180 }),
         initNodeEdge({
           source: "1",
           target: "2"
@@ -310,6 +319,49 @@ function HomePage() {
       }
     };
     setElements(tempElems);
+    setShowDrawer(null);
+  };
+
+  const handleDeleteCondition = nodeId => {
+    // console.log(nodeId);
+    // console.log(elementsStateRef.current);
+    // let tempElems = Object.assign([], elementsStateRef.current);
+    // let tempElemIndex = tempElems.findIndex(t => t.id === nodeId);
+    // tempElems[tempElemIndex] = {
+    //   ...tempElems[tempElemIndex],
+    //   data: {
+    //     ...tempElems[tempElemIndex]?.data,
+    //     item: (tempElems[tempElemIndex]?.data?.item || []).filter(
+    //       (x, i) => i !== itemIndex
+    //     )
+    //   }
+    // };
+    // console.log([
+    //   ...tempElems.filter(
+    //     e =>
+    //       e.type !== "btnSelectorNode" &&
+    //       !new RegExp(
+    //         tempElems
+    //           .filter(e => e.type === "btnSelectorNode" && e.id > nodeId)
+
+    //           .includes()
+    //       ).test(e.id)
+    //   ),
+    //   ...tempElems.filter(e => e.id < nodeId)
+    // ]);
+    // setElements([
+    //   ...tempElems.filter(
+    //     e =>
+    //       e.type !== "btnSelectorNode" &&
+    //       !new RegExp(
+    //         tempElems
+    //           .filter(e => e.type === "btnSelectorNode" && e.id > nodeId)
+    //           .map(e => e.id)
+    //           .join("|")
+    //       ).test(e.id)
+    //   ),
+    //   ...tempElems.filter(e => e.id < nodeId)
+    // ]);
     setShowDrawer(null);
   };
 
@@ -435,8 +487,8 @@ function HomePage() {
       ), // 2
       initActionNodeElement(conditionObj[2], nodeId + 1, {
         // 3
-        x: position.x,
-        y: position.y + 400
+        x: position.x - 250,
+        y: position.y + 150
       }),
       ...(Object.keys(conditionObj[1][0])[0].includes("Fn::")
         ? recursionFromElement(
@@ -457,12 +509,20 @@ function HomePage() {
       initNodeEdge({
         source: nodeId,
         target: Number(nodeId) + 1,
-        label: "yes"
+        label: "yes",
+        labelBgPadding: [8, 4],
+        labelBgBorderRadius: 13,
+        labelStyle: { fill: "#3b8dd6", fontWeight: 700 },
+        labelBgStyle: { fill: "#f1f7fb" }
       }),
       initNodeEdge({
         source: nodeId,
         target: Number(nodeId) + 2,
-        label: "no"
+        label: "no",
+        labelBgPadding: [8, 4],
+        labelBgBorderRadius: 13,
+        labelStyle: { fill: "#4a5568", fontWeight: 700 },
+        labelBgStyle: { fill: "#ececec" }
       })
     ];
   };
@@ -508,7 +568,7 @@ function HomePage() {
         initialElements.push(
           initActionNodeElement(sampleFlowConditions[i + 1], nodeId, {
             x: 250,
-            y: 25
+            y: 50
           }),
           initNodeEdge({
             source: (Number(nodeId) - 1).toString(),

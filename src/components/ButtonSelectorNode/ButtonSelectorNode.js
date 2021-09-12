@@ -4,8 +4,8 @@ import { Handle, useStoreState } from "react-flow-renderer";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import LoopIcon from "@material-ui/icons/Loop";
 import IconButton from "@material-ui/core/IconButton";
+// import LoopIcon from "@material-ui/icons/Loop";
 
 import "./ButtonSelectorNode.scss";
 
@@ -19,14 +19,14 @@ export default memo(({ id, data, isConnectable }) => {
       }`}
       onClick={() => data.focusNodeAction(id)}
     >
-      <div>
-        <Typography variant="body1">{data.label}</Typography>
-      </div>
+      <Typography variant="body1" className="node-label">
+        {data.label}
+      </Typography>
 
       {/* Event type */}
       {data.type === "event" &&
         (data.item ? (
-          <Button variant="contained" disabled className="lbl-event">
+          <Button variant="text" disabled className="lbl-event">
             {data.item?.eventDisplay}
           </Button>
         ) : (
@@ -36,7 +36,7 @@ export default memo(({ id, data, isConnectable }) => {
                 data.btnAction(id);
                 e.stopPropagation();
               }}
-              variant="contained"
+              variant="text"
             >
               {data.btnLabel}
             </Button>
@@ -47,19 +47,31 @@ export default memo(({ id, data, isConnectable }) => {
       {(data.type === "condition" || data.type === "choice") && (
         <>
           {data.type === "condition" && (
-            <IconButton
-              disableRipple
-              className="btn-swap"
-              onClick={e => {
-                data.handleSwapConditionArrows(id);
-                e.stopPropagation();
-              }}
-            >
-              <LoopIcon />
-            </IconButton>
+            <>
+              {/* <IconButton
+                disableRipple
+                className="btn-swap"
+                onClick={e => {
+                  data.handleSwapConditionArrows(id);
+                  e.stopPropagation();
+                }}
+              >
+                <LoopIcon />
+              </IconButton> */}
+              <IconButton
+                disableRipple
+                className="btn-delete"
+                onClick={e => {
+                  data.handleDeleteCondition(id);
+                  e.stopPropagation();
+                }}
+              >
+                <HighlightOffIcon />
+              </IconButton>
+            </>
           )}
           {data.item ? (
-            <Button variant="contained" disabled className="lbl-condition">
+            <Button variant="text" disabled className="lbl-condition">
               {Object.keys(data.item)[0].includes("Fn::")
                 ? Object.values(data.item)[0]
                     .map(
@@ -80,7 +92,7 @@ export default memo(({ id, data, isConnectable }) => {
                   data.btnAction(id);
                   e.stopPropagation();
                 }}
-                variant="contained"
+                variant="text"
               >
                 {data.btnLabel}
               </Button>
@@ -97,7 +109,7 @@ export default memo(({ id, data, isConnectable }) => {
               <React.Fragment key={i}>
                 <div className="label-div">
                   <Button
-                    variant="contained"
+                    variant="text"
                     onClick={e => {
                       data.handleSelectAction(id, i);
                       e.stopPropagation();
@@ -130,7 +142,7 @@ export default memo(({ id, data, isConnectable }) => {
                 data.btnAction(id);
                 e.stopPropagation();
               }}
-              variant="contained"
+              variant="text"
             >
               Add Action
             </Button>
@@ -142,7 +154,7 @@ export default memo(({ id, data, isConnectable }) => {
                 data.btnAction(id);
                 e.stopPropagation();
               }}
-              variant="contained"
+              variant="text"
             >
               {data.btnLabel}
             </Button>
@@ -161,7 +173,7 @@ export default memo(({ id, data, isConnectable }) => {
             data.btnAction2(id);
             e.stopPropagation();
           }}
-          variant="contained"
+          variant="text"
         >
           {data.btnLabel2}
         </Button>
@@ -170,7 +182,7 @@ export default memo(({ id, data, isConnectable }) => {
       <Handle
         type="source"
         position="bottom"
-        style={{ bottom: 10, top: "auto", background: "#555" }}
+        style={{ bottom: 10, top: "auto", background: "transparent" }}
         isConnectable={isConnectable}
       />
     </div>

@@ -1,10 +1,10 @@
 import createMuiTheme from "@material-ui/core/styles/createTheme";
+import fontFamily from "./fontFamily";
 
-const fontFamily = ["Roboto", "Helvetica Neue", "Arial", "sans-serif"];
 const colors = {
-  primary: "#008CDC",
+  primary: "#3b8dd6",
   secondary: "#fae100",
-  primaryLight: "#1e95da",
+  primaryLight: "#f1f7fb",
   primaryDark: "#007ABF",
   success: "#009C6A",
   successLight: "#d1ffe3",
@@ -36,9 +36,20 @@ export const theme = createMuiTheme({
     }
   },
   typography: {
-    fontFamily: `${fontFamily.join(",")} !important`
+    fontFamily: `${[
+      "Poppins",
+      "Roboto",
+      "Helvetica Neue",
+      "Arial",
+      "sans-serif"
+    ].join(",")} !important`
   },
   overrides: {
+    MuiCssBaseline: {
+      "@global": {
+        "@font-face": fontFamily
+      }
+    },
     MuiTypography: {
       h3: {
         fontSize: "1.3rem",
@@ -98,7 +109,7 @@ export const theme = createMuiTheme({
         overflow: "hidden"
       },
       text: {
-        fontSize: "0.8rem",
+        fontSize: "0.9rem",
         color: `${colors.primary} !important`,
         textTransform: "inherit",
         fontWeight: "500 !important",
