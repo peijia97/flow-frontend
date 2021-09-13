@@ -16,6 +16,7 @@ import "./HomePage.scss";
 const nodeTypes = {
   btnSelectorNode: ButtonSelectorNode
 };
+let totalConditionsCount = 0;
 
 function HomePage() {
   useEffect(() => {
@@ -131,7 +132,7 @@ function HomePage() {
       },
       btnAction: id => {
         setShowDrawer("conditions");
-        setTotalConditionsCount(totalConditionsCountStateRef.current + 1);
+        totalConditionsCount += 1;
         setSelectedNode(id);
 
         let tempElems = Object.assign([], elementsStateRef.current);
@@ -147,7 +148,7 @@ function HomePage() {
             x: position.x - 250,
             y: position.y + 150
           }),
-          totalConditionsCountStateRef.current + 1 === 3 // reached max 3 conditions limit
+          totalConditionsCount + 1 > 3 // reached max 3 conditions limit
             ? initActionNodeElement(null, Number(nodeId) + 2, {
                 x: position.x + 300,
                 y: position.y + 150
@@ -224,7 +225,6 @@ function HomePage() {
   const [selectedNode, setSelectedNode] = useState("1");
   const [selectedActionIndex, setSelectedActionIndex] = useState(null);
   const [unavailableActionKeys, setUnavailableActionKeys] = useState([]);
-  const [totalConditionsCount, setTotalConditionsCount] = useState(0);
   const [elements, setElements] = useState([initEventNodeElement()]);
   const onElementsRemove = elementsToRemove =>
     setElements(els => removeElements(elementsToRemove, els));
@@ -236,8 +236,6 @@ function HomePage() {
   selectedNodeStateRef.current = selectedNode;
   const unavailableActionKeysStateRef = useRef();
   unavailableActionKeysStateRef.current = unavailableActionKeys;
-  const totalConditionsCountStateRef = useRef();
-  totalConditionsCountStateRef.current = totalConditionsCount;
 
   const handleEventChange = event => {
     // setFlow({ ...flow, eventKey: event.eventKey });
@@ -297,7 +295,6 @@ function HomePage() {
             : [...(tempElems[tempElemIndex]?.data?.item || []), actionObj]
       }
     };
-    console.log(selectedNode);
     setUnavailableActionKeys([...unavailableActionKeys, actionObj.actionKey]);
     setElements(tempElems);
   };
@@ -323,45 +320,30 @@ function HomePage() {
   };
 
   const handleDeleteCondition = nodeId => {
-    // console.log(nodeId);
-    // console.log(elementsStateRef.current);
-    // let tempElems = Object.assign([], elementsStateRef.current);
-    // let tempElemIndex = tempElems.findIndex(t => t.id === nodeId);
-    // tempElems[tempElemIndex] = {
-    //   ...tempElems[tempElemIndex],
-    //   data: {
-    //     ...tempElems[tempElemIndex]?.data,
-    //     item: (tempElems[tempElemIndex]?.data?.item || []).filter(
-    //       (x, i) => i !== itemIndex
-    //     )
-    //   }
-    // };
-    // console.log([
-    //   ...tempElems.filter(
-    //     e =>
-    //       e.type !== "btnSelectorNode" &&
-    //       !new RegExp(
-    //         tempElems
-    //           .filter(e => e.type === "btnSelectorNode" && e.id > nodeId)
+    let tempElems = Object.assign([], elementsStateRef.current);
+    const targetNode = tempElems.find(e => e.id === nodeId);
 
-    //           .includes()
-    //       ).test(e.id)
-    //   ),
-    //   ...tempElems.filter(e => e.id < nodeId)
-    // ]);
-    // setElements([
-    //   ...tempElems.filter(
-    //     e =>
-    //       e.type !== "btnSelectorNode" &&
-    //       !new RegExp(
-    //         tempElems
-    //           .filter(e => e.type === "btnSelectorNode" && e.id > nodeId)
-    //           .map(e => e.id)
-    //           .join("|")
-    //       ).test(e.id)
-    //   ),
-    //   ...tempElems.filter(e => e.id < nodeId)
-    // ]);
+    totalConditionsCount = tempElems.filter(
+      e =>
+        e.type === "btnSelectorNode" &&
+        e.data.type === "condition" &&
+        e.id < nodeId
+    ).length;
+
+    setElements([
+      ...tempElems.filter(
+        e =>
+          e.type !== "btnSelectorNode" &&
+          !new RegExp(
+            tempElems
+              .filter(e => e.type === "btnSelectorNode" && e.id > nodeId)
+              .map(e => e.id)
+              .join("|")
+          ).test(e.id)
+      ),
+      ...tempElems.filter(e => e.id < nodeId),
+      initChoiceNodeElement(nodeId, targetNode.position)
+    ]);
     setShowDrawer(null);
   };
 
@@ -594,14 +576,20 @@ function HomePage() {
         <div className="drawer">
           {showDrawer === "events" && (
             <Events
-              selectedEventKey={elements[0].data?.item?.eventKey}
+              selectedEventKey={
+                elements.find(e => e.data?.type === "event").data?.item
+                  ?.eventKey
+              }
               handleSelect={handleEventChange}
             />
           )}
 
           {showDrawer === "conditions" && (
             <Conditions
-              selectedEventKey={elements[0].data?.item?.eventKey}
+              selectedEventKey={
+                elements.find(e => e.data?.type === "event").data?.item
+                  ?.eventKey
+              }
               selectedConditionObj={
                 elementsStateRef.current.find(
                   el => el.id === selectedNodeStateRef.current
