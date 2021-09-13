@@ -68,6 +68,15 @@ const Conditions = props => {
     setConditions([...conditions, initialConditionObj]);
   };
 
+  const arrayEquals = (a, b) => {
+    return (
+      Array.isArray(a) &&
+      Array.isArray(b) &&
+      a.length === b.length &&
+      a.every((val, index) => val === b[index])
+    );
+  };
+
   const handleOnSave = () => {
     // Empty field validation
     if (
@@ -82,15 +91,54 @@ const Conditions = props => {
       });
       return;
     }
-    let tempConditions = Object.assign([], conditions)
+
+    // Validate contradiction
+    if (
+      conditions.length > 1 &&
+      (conditions.find(c => c.operator === ">")?.value[0] >
+        conditions.find(c => c.operator === "<" || c.operator === "<=")
+          ?.value[0] ||
+        conditions.find(c => c.operator === ">=")?.value[0] >=
+          conditions.find(c => c.operator === "<=" || c.operator === "<")
+            ?.value[0] ||
+        (conditions.find(c => c.operator === "later than")?.value &&
+          conditions.find(c => c.operator === "earlier than")?.value &&
+          conditions.find(c => c.operator === "later than")?.value[0] >
+            conditions.find(c => c.operator === "earlier than")?.value[0]) ||
+        (conditions.find(c => c.operator === "=")?.value &&
+          conditions.find(c => c.operator === "!=")?.value &&
+          arrayEquals(
+            conditions.find(c => c.operator === "=").value,
+            conditions.find(c => c.operator === "!=").value
+          )) ||
+        (conditions.find(c => c.operator === "contains")?.value &&
+          conditions.find(c => c.operator === "not contains")?.value &&
+          arrayEquals(
+            conditions.find(c => c.operator === "contains").value,
+            conditions.find(c => c.operator === "not contains").value
+          )))
+    ) {
+      setModalState({
+        title: "Warning",
+        subtitle: "Conditions have contradiction. Please try again.",
+        btnLabel: "OK"
+      });
+      return;
+    }
+
+    let tempConditions = Object.assign([], conditions);
     while (tempConditions.length > 0) {
       const firstCondition = tempConditions[0];
-      const groupedConditions = tempConditions.filter(c => c.conditionKey === firstCondition.conditionKey);
+      const groupedConditions = tempConditions.filter(
+        c => c.conditionKey === firstCondition.conditionKey
+      );
       // groupedConditions.filter(g=>g.value.includes())
 
-      tempConditions = tempConditions.filter(c=>groupedConditions.includes(c.conditionKey))
+      tempConditions = tempConditions.filter(c =>
+        groupedConditions.includes(c.conditionKey)
+      );
     }
-    console.log(conditions)
+    console.log(conditions);
     const result = mustMeet ? { [mustMeet]: conditions } : conditions[0];
     handleSelect(result);
   };
