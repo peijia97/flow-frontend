@@ -22,7 +22,6 @@ const Actions = props => {
     handleAddAction,
     actionsArr,
     selectedActionObj,
-    unavailableActionKeys,
     ...rest
   } = props;
 
@@ -102,7 +101,8 @@ const Actions = props => {
           {...rest}
         >
           {SAMPLE_ACTIONS.filter(
-            action => !unavailableActionKeys.includes(action.actionKey)
+            action =>
+              !actionsArr.map(a => a.actionKey).includes(action.actionKey)
           ).map(item => (
             <Button
               key={item.actionKey}
@@ -119,7 +119,8 @@ const Actions = props => {
           ))}
 
           {!SAMPLE_ACTIONS.filter(
-            action => !unavailableActionKeys.includes(action.actionKey)
+            action =>
+              !actionsArr.map(a => a.actionKey).includes(action.actionKey)
           ).length && (
             <Typography variant="body1" className="label-no-more">
               No action available
@@ -203,7 +204,6 @@ const Actions = props => {
 Actions.propTypes = {
   handleSelect: PropTypes.func,
   handleAddAction: PropTypes.func,
-  unavailableActionKeys: PropTypes.array,
   actionsArr: PropTypes.array,
   selectedActionObj: PropTypes.object
 };
