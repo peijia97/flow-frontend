@@ -233,8 +233,8 @@ function HomePage() {
 
   const handleEventChange = event => {
     // setFlow({ ...flow, eventKey: event.eventKey });
-    let tempElems = Object.assign([], elementsStateRef.current);
-    tempElems[0] = initEventNodeElement(event);
+    // let tempElems = Object.assign([], elementsStateRef.current);
+    const tempElems = [initEventNodeElement(event)];
 
     if (tempElems.length === 1) {
       tempElems.push(
