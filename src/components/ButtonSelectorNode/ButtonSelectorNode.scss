@@ -32,6 +32,7 @@
     padding: 0%;
     position: absolute;
     visibility: hidden;
+    right: -3.2rem;
   }
   .label-div:hover .MuiIconButton-root {
     visibility: visible;
@@ -63,7 +64,7 @@
   .lbl-event,
   .lbl-condition,
   .lbl-action {
-    font-weight: bold !important;
-    color: $primary !important;
+    font-weight: 600 !important;
+    color: $grey800 !important;
   }
 }
