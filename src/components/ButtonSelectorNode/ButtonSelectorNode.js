@@ -62,7 +62,7 @@ export default memo(({ id, data, isConnectable }) => {
                 disableRipple
                 className="btn-delete"
                 onClick={e => {
-                  data.handleDeleteCondition(id);
+                  data.handleRemoveNode(id, "condition");
                   e.stopPropagation();
                 }}
               >
@@ -102,6 +102,18 @@ export default memo(({ id, data, isConnectable }) => {
       )}
 
       {/* Action Type */}
+      {data.type === "action" && id === "2" && !data.item?.length && (
+        <IconButton
+          disableRipple
+          className="btn-delete"
+          onClick={e => {
+            data.handleRemoveNode(id, "condition");
+            e.stopPropagation();
+          }}
+        >
+          <HighlightOffIcon />
+        </IconButton>
+      )}
       {data.type === "action" &&
         (data.item?.length ? (
           <>

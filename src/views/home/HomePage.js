@@ -71,7 +71,7 @@ function HomePage() {
         setSelectedNode(id);
       },
       handleSwapConditionArrows: id => handleSwapConditionArrows(id),
-      handleDeleteCondition: id => handleDeleteCondition(id),
+      handleRemoveNode: (id, nodeType) => handleRemoveNode(id, nodeType),
       btnAction: id => {
         setShowDrawer("conditions");
         setSelectedNode(id);
@@ -110,7 +110,8 @@ function HomePage() {
       handleDeleteAction: (id, itemIndex, actionKey) => {
         setSelectedNode(id);
         handleDeleteAction(id, itemIndex);
-      }
+      },
+      handleRemoveNode: (id, nodeType) => handleRemoveNode(id, nodeType)
     }
   });
 
@@ -312,16 +313,18 @@ function HomePage() {
     setShowDrawer(null);
   };
 
-  const handleDeleteCondition = nodeId => {
+  const handleRemoveNode = (nodeId, nodeType) => {
     let tempElems = Object.assign([], elementsStateRef.current);
     const targetNode = tempElems.find(e => e.id === nodeId);
 
-    totalConditionsCount = tempElems.filter(
-      e =>
-        e.type === "btnSelectorNode" &&
-        e.data.type === "condition" &&
-        e.id < nodeId
-    ).length;
+    if (nodeType === "condition") {
+      totalConditionsCount = tempElems.filter(
+        e =>
+          e.type === "btnSelectorNode" &&
+          e.data.type === "condition" &&
+          e.id < nodeId
+      ).length;
+    }
 
     setElements([
       ...tempElems.filter(
@@ -331,7 +334,7 @@ function HomePage() {
             tempElems
               .filter(e => e.type === "btnSelectorNode" && e.id > nodeId)
               .map(e => e.id)
-              .join("|")
+              .join("|") || "0" // set '0' to test Regex if array return empty to return false, to prevent empty string test Regex returns true
           ).test(e.id)
       ),
       ...tempElems.filter(e => e.id < nodeId),
